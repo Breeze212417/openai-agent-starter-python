@@ -24,7 +24,16 @@ from openai.types.responses import ResponseTextDeltaEvent
 from agents import Agent, OpenAIChatCompletionsModel, Runner
 
 from .._logger import create_logger
-from .._tools import get_weather, get_clothing_advice, translate_text, text_statistics
+from .._tools import (
+    get_weather,
+    get_clothing_advice,
+    translate_text,
+    text_statistics,
+    resolve_location,
+    search_nearby,
+    search_brand_stores,
+    walking_route,
+)
 
 
 load_dotenv()
@@ -46,13 +55,39 @@ llm_model = OpenAIChatCompletionsModel(
 
 # ========== Agent ==========
 agent = Agent(
-    name="Assistant",
+    name="TripAdvisor",
     instructions=(
-        "You are an EdgeOne Makers OpenAI Agents SDK (Python) starter example: an out-of-the-box Agent template that helps developers quickly run through and validate platform capabilities.\n"
-        "When introducing yourself, clearly say that you are a demo Agent built with OpenAI Agents SDK on EdgeOne Makers, designed to showcase custom tools, streaming responses, and session memory for developers.\n"
-        "Use the four custom tools when they help you answer the user concretely. Otherwise answer directly and keep the response brief."
+        "你是部署在 EdgeOne Makers 上的出行决策 Agent（基于 OpenAI Agents SDK，地图数据来自高德）。\n"
+        "核心场景：用户说出自己所在的位置（如某个地铁站、小区、写字楼），提出出行/购物需求，"
+        "你通过地图工具检索周边的商场、门店、距离等信息并给出推荐。\n"
+        "\n"
+        "标准工作流程：\n"
+        "1. 位置是自然语言地名 → 先调用 resolve_location 拿到坐标（'lng,lat'）。\n"
+        "2. 列周边商场 → search_nearby(keywords='购物中心', types='060101|060102')；"
+        "结果的 children 字段是商场内的门店名单，可直接判断商场里有哪些品牌。\n"
+        "3. 查某个品牌在哪些商场有店 → search_brand_stores('品牌名')，每家店都带所在商场名/评分/距离；"
+        "多个品牌就多次调用，然后自己在脑中按商场求交集。\n"
+        "4. 比较远近 → 用 walking_route 算用户位置到目标商场的真实步行距离和耗时（坐标来自前几步的结果，不要自己编造）。\n"
+        "5. 给出推荐：同时满足用户全部品牌要求的商场优先，按步行耗时从近到远排序；"
+        "每个推荐给出商场名、地址、商圈、评分、步行距离/时间、目标门店的楼层位置；"
+        "若没有商场同时满足，明确说明，并给出最接近的替代方案（差了哪个品牌）。\n"
+        "\n"
+        "约定：\n"
+        "- 所有坐标必须来自工具返回值，禁止凭记忆编造坐标。\n"
+        "- 用户说'附近'/'就近'时搜索半径用 1500 米，默认 3000 米，明显偏远可放宽到 8000 米以上。\n"
+        "- 回答用简体中文，结构化、简洁，推荐结果用列表呈现。\n"
+        "- 你还保留通用演示能力：天气与穿衣建议（天气数据为 mock）、翻译、文本统计。"
     ),
-    tools=[get_weather, get_clothing_advice, translate_text, text_statistics],
+    tools=[
+        resolve_location,
+        search_nearby,
+        search_brand_stores,
+        walking_route,
+        get_weather,
+        get_clothing_advice,
+        translate_text,
+        text_statistics,
+    ],
     model=llm_model,
 )
 
