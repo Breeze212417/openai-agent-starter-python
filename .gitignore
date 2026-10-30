@@ -9,10 +9,10 @@ dist/
 .edgeone/
 .edgeone.zip
 
-# Environment variables
+# Environment variables (never commit real secrets)
 .env
-agents-python/.env
-agents-python/chat/.env
+.env.*
+!.env.example
 
 # OS
 .DS_Store
@@ -39,3 +39,10 @@ plan/
 # AI assistant local instructions
 CLAUDE.md
 AGENTS.md
+
+# Workspace tooling
+.workbuddy/
+
+# Tencent Cloud EdgeOne
+.edgeone/*
+.tef_dist/*

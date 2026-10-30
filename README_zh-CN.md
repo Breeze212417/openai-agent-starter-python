@@ -25,6 +25,7 @@
 | `AI_GATEWAY_API_KEY` | 是 | 模型网关 API Key。可填 Makers Models 的 API Key，也可以是任意 OpenAI 兼容服务商的 Key。 |
 | `AI_GATEWAY_BASE_URL` | 是 | 网关 Base URL。Makers Models 请使用 `https://ai-gateway.edgeone.link/v1`。 |
 | `AI_GATEWAY_MODEL` | 否 | 模型 ID。默认 `@makers/deepseek-v4-flash`（内置免费模型）。 |
+| `AMAP_API_KEY` | 是 | 高德开放平台「Web 服务」类型 Key。出行决策工具（`resolve_location` / `search_nearby` / `search_brand_stores` / `walking_route`）使用。在 [console.amap.com](https://console.amap.com/dev/key/app) 创建应用并添加 Key。 |
 
 模板遵循 OpenAI 兼容协议，可以指向 Makers Models，也可以指向任意 OpenAI 兼容的服务商。
 

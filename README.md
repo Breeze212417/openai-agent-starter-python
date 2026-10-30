@@ -25,6 +25,7 @@ A minimal, production-shaped Python starter that wires the OpenAI Agents SDK int
 | `AI_GATEWAY_API_KEY` | Yes | Model gateway API key. Use your Makers Models API Key, or any OpenAI-compatible provider key. |
 | `AI_GATEWAY_BASE_URL` | Yes | Gateway base URL. For Makers Models, use `https://ai-gateway.edgeone.link/v1`. |
 | `AI_GATEWAY_MODEL` | No | Model ID. Defaults to `@makers/deepseek-v4-flash` (a free built-in model). |
+| `AMAP_API_KEY` | Yes | AMap "Web 服务" (REST) key. Powers the trip-planning tools (`resolve_location` / `search_nearby` / `search_brand_stores` / `walking_route`). Create one at [console.amap.com](https://console.amap.com/dev/key/app). |
 
 This template follows the OpenAI-compatible standard — point these at Makers Models or any compatible provider.
 
