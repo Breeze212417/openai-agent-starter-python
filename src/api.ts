@@ -20,7 +20,7 @@ import type {
 
 export const API = {
   chat: '/chat',
-  chatStop: '/chat/stop'                        // Abort the active agent run
+  chatStop: '/chat/stop',                        // Abort the active agent run
   history: '/history',                      // Get conversation history
   clearHistory: '/clear-history',           // Clear messages in a conversation
   conversations: '/conversations',          // List conversations for a user
