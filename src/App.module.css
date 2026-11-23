@@ -100,13 +100,17 @@
   to { transform: rotate(360deg); }
 }
 
-/* ── Right: code / trace panel — collapsible ──────────────
-   Collapsed by default; expands into a docked note card with
-   a width + slide transition. Negative margin cancels the
-   stage gap so the chat panel reclaims the full width.        */
+/* ── Right: code / trace panel — floating drawer ──────────
+   Collapsed by default. The drawer is absolutely positioned over
+   the stage (no flex-basis), so opening it NEVER resizes the chat
+   panel. A translucent scrim dims the rest of the page.          */
 .codePanel {
-  flex: 0 0 0%;
-  margin-left: calc(-1 * var(--spacing-24));
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  width: min(460px, 42vw);
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -115,61 +119,54 @@
   border: var(--border-doodle-thick);
   border-radius: var(--radius-cards);
   background: var(--color-cream);
-  box-shadow: none;
+  box-shadow: var(--shadow-note-hover);
   opacity: 0;
-  transform: translateX(24px) rotate(0.6deg);
+  transform: translateX(calc(100% + var(--spacing-24))) rotate(0.6deg);
   pointer-events: none;
   visibility: hidden;
-  transition: flex-basis 360ms cubic-bezier(.22, 1, .36, 1),
-              margin-left 360ms cubic-bezier(.22, 1, .36, 1),
+  transition: transform 360ms cubic-bezier(.22, 1, .36, 1),
               opacity 240ms ease,
-              transform 360ms cubic-bezier(.22, 1, .36, 1),
-              box-shadow 360ms ease,
               visibility 0s linear 360ms;
 }
 
 .codePanelOpen {
-  flex-basis: 38%;
-  margin-left: 0;
   opacity: 1;
   transform: translateX(0) rotate(0.6deg);
   pointer-events: auto;
   visibility: visible;
-  box-shadow: var(--shadow-note);
   transition-delay: 0s;
 }
 
-@media (max-width: 1100px) {
-  .codePanelOpen { flex-basis: 36%; }
+/* Scrim behind the drawer — click anywhere to close */
+.panelScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  border: 0;
+  padding: 0;
+  background: rgba(44, 44, 44, 0.28);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 240ms ease, visibility 0s linear 240ms;
 }
+.panelScrimOpen {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.panelScrim:focus-visible { outline: none; }
 
-/* Narrow screens: the inspector becomes an overlay drawer so the
-   chat panel stays usable.                                      */
 @media (max-width: 900px) {
   .codePanel,
-  .codePanelOpen {
-    flex-basis: 0;
-    margin-left: 0;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 20;
-    width: min(420px, 82vw);
-    box-shadow: var(--shadow-note-hover);
-  }
-  .codePanel {
-    transform: translateX(105%) rotate(0.6deg);
-    opacity: 0;
-  }
-  .codePanelOpen {
-    transform: translateX(0) rotate(0.6deg);
-    opacity: 1;
-  }
+  .codePanelOpen { width: min(420px, 88vw); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .codePanel { transition: none; }
+  .codePanel,
+  .panelScrim { transition: none; }
 }
 
 /* ── Header (inside chat panel) ─────────────────────────────

@@ -28,6 +28,8 @@ _AMAP_GEOCODE_URL = "https://restapi.amap.com/v3/geocode/geo"
 _AMAP_AROUND_URL = "https://restapi.amap.com/v5/place/around"
 _AMAP_DETAIL_URL = "https://restapi.amap.com/v5/place/detail"
 _AMAP_WALKING_URL = "https://restapi.amap.com/v5/direction/walking"
+_AMAP_CYCLING_URL = "https://restapi.amap.com/v4/direction/bicycling"
+_AMAP_DRIVING_URL = "https://restapi.amap.com/v5/direction/driving"
 
 
 def _amap_key() -> str:
@@ -247,6 +249,121 @@ def walking_route(
         },
         ensure_ascii=False,
     )
+
+
+def _route_summary(
+    url: str,
+    origin: str,
+    destination: str,
+    mode: str,
+    extra_fields: str = "cost",
+) -> str:
+    """Shared AMap v5 direction parser for cycling / driving routes."""
+    data = _amap_get(
+        url,
+        origin=origin.strip(),
+        destination=destination.strip(),
+        show_fields=extra_fields,
+    )
+    paths = (data.get("route") or {}).get("paths") or []
+    if not paths:
+        return json.dumps(
+            {"ok": False, "mode": mode, "hint": f"两点之间未找到{mode}路线"},
+            ensure_ascii=False,
+        )
+    path = paths[0]
+    try:
+        duration_min = round(int(path["cost"]["duration"]) / 60)
+    except (KeyError, ValueError, TypeError):
+        duration_min = None
+    result = {
+        "ok": True,
+        "mode": mode,
+        "distance_m": path.get("distance", ""),
+        "duration_min": duration_min,
+        "steps": [
+            (step.get("instruction") or step.get("road") or "").strip()
+            for step in (path.get("steps") or [])[:5]
+            if (step.get("instruction") or step.get("road") or "").strip()
+        ],
+    }
+    tolls = (path.get("cost") or {}).get("toll")
+    if tolls not in (None, "", "0"):
+        result["toll_yuan"] = tolls
+    return json.dumps(result, ensure_ascii=False)
+
+
+# ========== Tool: Cycling Route (AMap v4 direction/bicycling) ==========
+@function_tool
+def cycling_route(
+    origin: Annotated[str, "起点坐标，格式 'lng,lat'（通常是用户位置）"],
+    destination: Annotated[str, "终点坐标，格式 'lng,lat'（通常是目标商场）"],
+) -> str:
+    """Get a real cycling route between two coordinates via AMap v4 bicycling.
+
+    Use for medium distances (roughly 2-10 km). Returns JSON with mode,
+    distance_m, duration_min (real cycling time) and up to 5 turn-by-turn steps.
+    Compare with walking_route / driving_route to recommend the best option.
+    """
+    # v4 bicycling uses a different envelope (errcode / data.paths) than v5,
+    # so it cannot go through _amap_get's status/infocode check.
+    resp = requests.get(
+        _AMAP_CYCLING_URL,
+        params={
+            "origin": origin.strip(),
+            "destination": destination.strip(),
+            "key": _amap_key(),
+        },
+        timeout=15,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    errcode = data.get("errcode")
+    if errcode not in (None, 0, "0"):
+        return json.dumps(
+            {"ok": False, "mode": "cycling", "hint": f"骑行路线查询失败: {data.get('errmsg', '')}"},
+            ensure_ascii=False,
+        )
+    paths = (data.get("data") or {}).get("paths") or []
+    if not paths:
+        return json.dumps(
+            {"ok": False, "mode": "cycling", "hint": "两点之间未找到骑行路线"},
+            ensure_ascii=False,
+        )
+    path = paths[0]
+    try:
+        duration_min = round(int(path["duration"]) / 60)
+    except (KeyError, ValueError, TypeError):
+        duration_min = None
+    return json.dumps(
+        {
+            "ok": True,
+            "mode": "cycling",
+            "distance_m": path.get("distance", ""),
+            "duration_min": duration_min,
+            "steps": [
+                s.get("instruction", "").strip()
+                for s in (path.get("steps") or [])[:5]
+                if s.get("instruction", "").strip()
+            ],
+        },
+        ensure_ascii=False,
+    )
+
+
+# ========== Tool: Driving Route (AMap v5 direction/driving) ==========
+@function_tool
+def driving_route(
+    origin: Annotated[str, "起点坐标，格式 'lng,lat'（通常是用户位置）"],
+    destination: Annotated[str, "终点坐标，格式 'lng,lat'（通常是目标商场）"],
+) -> str:
+    """Get a real driving route between two coordinates via AMap v5.
+
+    Use for longer distances (roughly >10 km) or when the user mentions driving / taxi.
+    Returns JSON with mode, distance_m, duration_min (real driving time),
+    toll_yuan when tolls apply, and up to 5 turn-by-turn steps.
+    """
+    return _route_summary(_AMAP_DRIVING_URL, origin, destination, "driving", "cost,steps,tolls")
 
 
 # ========== Tool: Get Weather (AMap real weather) ==========

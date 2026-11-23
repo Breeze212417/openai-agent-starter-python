@@ -19,6 +19,9 @@ const en = {
   // Tool indicators
   "tool.weather": "Weather",
   "tool.clothing": "Clothing",
+  "tool.walk": "Walking",
+  "tool.cycling": "Cycling",
+  "tool.driving": "Driving",
   "tool.translate": "Translate",
   "tool.statistics": "Statistics",
 

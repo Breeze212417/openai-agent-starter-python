@@ -24,16 +24,30 @@ import { I18nProvider, LangToggle, useT, MessageKeys } from './i18n';
 import { deleteSnapshot, loadSnapshot, saveSnapshot } from './lib/chatUiStore';
 import styles from './App.module.css';
 
-const LAMP_IDS = ['get_weather', 'get_clothing_advice', 'translate_text', 'text_statistics'] as const;
+const LAMP_IDS = [
+  'get_weather',
+  'get_clothing_advice',
+  'walking_route',
+  'cycling_route',
+  'driving_route',
+  'translate_text',
+  'text_statistics',
+] as const;
 const LAMP_ICONS: Record<string, string> = {
   get_weather: '☀️',
   get_clothing_advice: '👔',
+  walking_route: '🚶',
+  cycling_route: '🚲',
+  driving_route: '🚗',
   translate_text: '🌐',
   text_statistics: '📊',
 };
 const LAMP_I18N_KEYS: Record<string, string> = {
   get_weather: 'tool.weather',
   get_clothing_advice: 'tool.clothing',
+  walking_route: 'tool.walk',
+  cycling_route: 'tool.cycling',
+  driving_route: 'tool.driving',
   translate_text: 'tool.translate',
   text_statistics: 'tool.statistics',
 };
@@ -120,6 +134,16 @@ function AppInner() {
     try {
       localStorage.setItem(RIGHT_PANEL_STORAGE_KEY, String(rightPanelOpen));
     } catch { /* storage may be unavailable */ }
+  }, [rightPanelOpen]);
+
+  // Esc closes the inspector drawer when open.
+  useEffect(() => {
+    if (!rightPanelOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setRightPanelOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   }, [rightPanelOpen]);
 
   // Conversation list (sidebar) state
@@ -625,6 +649,14 @@ function AppInner() {
           </div>
           <ChatInput onSend={handleSend} onStop={handleStop} onClear={handleClearHistory} disabled={loading} />
         </div>
+
+        <button
+          type='button'
+          className={`${styles.panelScrim} ${rightPanelOpen ? styles.panelScrimOpen : ''}`}
+          onClick={() => setRightPanelOpen(false)}
+          aria-label={t('panel.hide')}
+          tabIndex={rightPanelOpen ? 0 : -1}
+        />
 
         <div className={`${styles.codePanel} ${rightPanelOpen ? styles.codePanelOpen : ''}`} aria-hidden={!rightPanelOpen}>
           {rightPanelMode === 'code' ? (

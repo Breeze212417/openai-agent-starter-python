@@ -33,6 +33,8 @@ from .._tools import (
     search_nearby,
     search_brand_stores,
     walking_route,
+    cycling_route,
+    driving_route,
 )
 
 
@@ -67,7 +69,9 @@ agent = Agent(
         "结果的 children 字段是商场内的门店名单，可直接判断商场里有哪些品牌。\n"
         "3. 查某个品牌在哪些商场有店 → search_brand_stores('品牌名')，每家店都带所在商场名/评分/距离；"
         "多个品牌就多次调用，然后自己在脑中按商场求交集。\n"
-        "4. 比较远近 → 用 walking_route 算用户位置到目标商场的真实步行距离和耗时（坐标来自前几步的结果，不要自己编造）。\n"
+        "4. 比较远近 → 用路线工具算用户位置到目标商场的真实距离和耗时（坐标来自前几步的结果，不要自己编造）。"
+        "按直线距离粗选出行方式：<2km 用 walking_route，2-10km 用 cycling_route，>10km 或用户提到开车/打车用 driving_route；"
+        "用户明确指定方式时按用户说的来。若用户想对比，可同时调用多个工具再比较耗时。\n"
         "5. 给出推荐：同时满足用户全部品牌要求的商场优先，按步行耗时从近到远排序；"
         "每个推荐给出商场名、地址、商圈、评分、步行距离/时间、目标门店的楼层位置；"
         "若没有商场同时满足，明确说明，并给出最接近的替代方案（差了哪个品牌）。\n"
@@ -95,6 +99,8 @@ agent = Agent(
         search_nearby,
         search_brand_stores,
         walking_route,
+        cycling_route,
+        driving_route,
         get_weather,
         get_clothing_advice,
         translate_text,

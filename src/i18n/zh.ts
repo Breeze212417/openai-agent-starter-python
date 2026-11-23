@@ -19,6 +19,9 @@ const zh = {
   // Tool indicators
   "tool.weather": "天气查询",
   "tool.clothing": "穿衣建议",
+  "tool.walk": "步行路线",
+  "tool.cycling": "骑行路线",
+  "tool.driving": "驾车路线",
   "tool.translate": "文本翻译",
   "tool.statistics": "文本统计",
 
