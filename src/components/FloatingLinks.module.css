@@ -1,23 +1,23 @@
 /* ═══════════════════════════════════════════════════════════
-   Floating action badges — Neumorphism
-   Dock handles the entrance animation; the anchor inside owns
-   the interactive transforms so the two never fight over
-   the `transform` property.
+   Floating action badges — Hand-drawn Doodle
+   Two pinned stickers: dashed ink outline, marker shadow,
+   tape tab on top, hover invert + tilt, press to flatten.
+   Dock handles entrance; anchor owns interactive transforms.
    ═══════════════════════════════════════════════════════════ */
 
 .dock {
   position: fixed;
   bottom: var(--spacing-16);
   z-index: 50;
-  animation: dockIn 520ms cubic-bezier(.22, 1, .36, 1) both;
+  animation: dockIn 460ms linear both;
 }
 
 .dockDeploy { right: 64px; animation-delay: 20ms; }
-.dockGithub { right: var(--spacing-16); animation-delay: 80ms; }
+.dockGithub { right: var(--spacing-16); animation-delay: 60ms; }
 
 @keyframes dockIn {
-  from { opacity: 0; transform: translateY(14px) scale(.86); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(14px) rotate(-12deg) scale(.86); }
+  to   { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
 }
 
 .fab {
@@ -25,67 +25,82 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   padding: 0;
-  border: none;
-  border-radius: var(--radius-pills);
-  background: var(--color-base);
-  color: var(--color-text-secondary);
-  box-shadow: 6px 6px 12px var(--color-shadow-grey), -6px -6px 12px var(--color-highlight);
+  border: var(--border-doodle);
+  border-radius: var(--radius-doodles);
+  background: var(--color-cream);
+  color: var(--color-ink);
+  box-shadow: 4px 4px 0 var(--color-marker-red);
   text-decoration: none;
   cursor: pointer;
-  transition: transform 280ms cubic-bezier(.22, 1, .36, 1),
-              box-shadow 280ms ease-out,
-              color 200ms ease-out;
+  transform: rotate(-3deg);
+  transition: transform 150ms linear, box-shadow 150ms linear, background 150ms linear, color 150ms linear;
+}
+
+/* Tape tab pinned to the top edge of each sticker */
+.fab::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 34px;
+  height: 12px;
+  transform: translateX(-50%) rotate(-5deg);
+  background: rgba(255, 217, 61, 0.85);
+  clip-path: polygon(0 22%, 8% 0, 16% 22%, 84% 22%, 92% 0, 100% 22%, 100% 78%, 92% 100%, 84% 78%, 16% 78%, 8% 100%, 0 78%);
+  pointer-events: none;
 }
 
 .fab:hover,
 .fab:focus-visible {
-  transform: translateY(-5px) scale(1.08);
-  color: var(--color-blurple);
-  box-shadow: 9px 9px 18px var(--color-shadow-grey), -9px -9px 18px var(--color-highlight);
+  transform: translate(-1px, -4px) rotate(1deg) scale(1.06);
+  background: var(--color-ink);
+  color: var(--color-cream);
+  box-shadow: 6px 6px 0 var(--color-marker-teal);
   outline: none;
 }
 
 .fab:active {
-  transform: translateY(-1px) scale(.94);
-  box-shadow: var(--shadow-pressed);
+  transform: translate(3px, 3px) rotate(0) scale(.96);
+  box-shadow: none;
 }
 
 /* Icon micro-motion — rocket tips forward, GitHub tilts */
-.fab svg { transition: transform 340ms cubic-bezier(.22, 1, .36, 1); }
+.fab svg { transition: transform 150ms linear; }
 .dockDeploy .fab:hover svg,
 .dockDeploy .fab:focus-visible svg { transform: translateY(-2px) rotate(10deg); }
 .dockGithub .fab:hover svg,
 .dockGithub .fab:focus-visible svg { transform: rotate(-14deg) scale(1.05); }
 
-/* Tooltip slides up + fades in, no flicker */
+/* Tooltip: hand-written note sliding up */
 .tooltip {
   position: absolute;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 10px);
   left: 50%;
   padding: 5px 10px;
+  border: var(--border-doodle);
   border-radius: var(--radius-buttons);
-  background: var(--color-base);
-  color: var(--color-text);
-  box-shadow: var(--shadow-raised-hover);
+  background: var(--color-cream);
+  color: var(--color-ink);
+  box-shadow: 3px 3px 0 var(--color-marker-yellow);
   font-family: var(--font-sans);
   font-size: var(--text-label);
+  font-weight: var(--fw-extrabold);
   line-height: 1.4;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transform: translate(-50%, 6px) scale(.94);
+  transform: translate(-50%, 8px) rotate(-3deg) scale(.94);
   transform-origin: bottom center;
-  transition: opacity 180ms ease,
-              transform 240ms cubic-bezier(.22, 1, .36, 1);
+  transition: opacity 150ms linear, transform 150ms linear;
 }
 
 .fab:hover .tooltip,
 .fab:focus-visible .tooltip {
   opacity: 1;
-  transform: translate(-50%, 0) scale(1);
+  transform: translate(-50%, 0) rotate(-3deg) scale(1);
 }
 
 @media (prefers-reduced-motion: reduce) {

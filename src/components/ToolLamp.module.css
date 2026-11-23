@@ -1,7 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
-   ToolLamp — Neumorphism
-   Raised chip when idle, pressed-in recess when the tool fires.
-   No scan sweeps, no glow — the shadow pair carries the state.
+   ToolLamp — Hand-drawn Doodle
+   Dashed chip when idle, scribbled marker highlight when firing.
    ═══════════════════════════════════════════════════════════ */
 
 .lamp {
@@ -9,46 +8,53 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: var(--spacing-8) 12px;
-  border-radius: var(--radius-pills);
-  border: none;
-  background: var(--color-base);
-  box-shadow: 4px 4px 8px var(--color-shadow-grey), -4px -4px 8px var(--color-highlight);
+  padding: 7px 11px;
+  border: var(--border-doodle);
+  border-radius: var(--radius-buttons);
+  background: var(--color-cream);
+  box-shadow: 3px 3px 0 rgba(44, 44, 44, 0.14);
   font-family: var(--font-sans);
   font-size: var(--text-label);
-  color: var(--color-text-secondary);
-  transition: box-shadow 200ms ease-out, color 200ms ease-out;
+  font-weight: var(--fw-semibold);
+  color: var(--color-ink);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
   cursor: default;
   user-select: none;
   white-space: nowrap;
 }
 
 .icon {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   line-height: 1;
   display: inline-block;
-  filter: grayscale(1) opacity(0.55);
-  transition: filter 200ms ease-out;
+  filter: grayscale(1) opacity(0.5);
+  transition: filter var(--transition-fast), transform var(--transition-fast);
 }
 
 .label {
   letter-spacing: 0.01em;
 }
 
-/* ── ACTIVE: pressed into the surface ── */
+/* ── ACTIVE: marker-yellow scribble + red solid shadow ── */
 .active {
-  color: var(--color-blurple);
-  box-shadow: var(--shadow-pressed);
-  animation: lampPulse 320ms ease-out both;
+  background: var(--color-marker-yellow);
+  color: var(--color-ink);
+  font-weight: var(--fw-extrabold);
+  border-style: dashed;
+  border-color: var(--color-ink);
+  box-shadow: 4px 4px 0 var(--color-marker-red);
+  transform: rotate(-2deg);
+  animation: lampPulse 320ms linear both;
 }
 .active .icon {
   filter: grayscale(0) opacity(1);
+  transform: rotate(10deg) scale(1.1);
 }
 
 @keyframes lampPulse {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(0.94); }
-  100% { transform: scale(1); }
+  0%   { transform: rotate(-2deg) scale(1); }
+  40%  { transform: rotate(-2deg) scale(0.9); }
+  100% { transform: rotate(-2deg) scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {

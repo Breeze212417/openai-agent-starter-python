@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   ToolIndicators — Neumorphism
+   ToolIndicators — Hand-drawn Doodle
    ═══════════════════════════════════════════════════════════ */
 
 .wrapper {
@@ -16,15 +16,15 @@
   justify-content: flex-end;
 }
 
-/* Stagger initial appearance, kept subtle */
-.row > *:nth-child(1) { animation: lampIn 260ms ease-out 40ms  both; }
-.row > *:nth-child(2) { animation: lampIn 260ms ease-out 80ms  both; }
-.row > *:nth-child(3) { animation: lampIn 260ms ease-out 120ms both; }
-.row > *:nth-child(4) { animation: lampIn 260ms ease-out 160ms both; }
+/* Stagger initial appearance — doodles popping onto the page */
+.row > *:nth-child(1) { animation: lampIn 260ms linear 40ms  both; }
+.row > *:nth-child(2) { animation: lampIn 260ms linear 80ms  both; }
+.row > *:nth-child(3) { animation: lampIn 260ms linear 120ms both; }
+.row > *:nth-child(4) { animation: lampIn 260ms linear 160ms both; }
 
 @keyframes lampIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(-4px) rotate(-3deg); }
+  to   { opacity: 1; transform: translateY(0) rotate(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {

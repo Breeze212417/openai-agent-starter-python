@@ -1,7 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
-   ChatInput — Neumorphism
-   Recessed input well, raised action buttons.
-   Blurple = send, coral = stop, muted = clear.
+   ChatInput — Hand-drawn Doodle
+   Scribble input + doodle preset chips / action buttons.
    ═══════════════════════════════════════════════════════════ */
 
 .bar {
@@ -10,7 +9,7 @@
   flex-direction: column;
   gap: var(--spacing-16);
   flex-shrink: 0;
-  box-shadow: inset 0 6px 12px -8px var(--color-shadow-grey);
+  border-top: 2px dashed var(--color-ink);
 }
 
 /* preset chips */
@@ -21,47 +20,50 @@
   min-width: 0;
 }
 .presetChip {
-  padding: var(--spacing-8) 14px;
+  padding: 8px 14px;
   max-width: 100%;
   min-width: 0;
-  border: none;
-  border-radius: var(--radius-pills);
-  background: var(--color-base);
-  box-shadow: 4px 4px 8px var(--color-shadow-grey), -4px -4px 8px var(--color-highlight);
-  color: var(--color-text-secondary);
-  font-family: var(--font-sans);
+  border: var(--border-doodle);
+  border-radius: var(--radius-buttons);
+  background: var(--color-cream);
+  box-shadow: 3px 3px 0 var(--color-marker-yellow);
+  color: var(--color-ink);
+  font-family: var(--font-body);
   font-size: var(--text-label);
+  font-weight: var(--fw-semibold);
   letter-spacing: 0.01em;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: box-shadow var(--transition-fast), color var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
 }
 .presetChip:hover:not(:disabled) {
-  color: var(--color-blurple);
-  box-shadow: var(--shadow-raised-hover);
+  background: var(--color-ink);
+  color: var(--color-cream);
+  transform: translate(-1px, -3px) rotate(-1deg);
+  box-shadow: 5px 5px 0 var(--color-marker-teal);
 }
-.presetChip:focus-visible { outline: 2px solid var(--color-blurple); outline-offset: 2px; }
-.presetChip:active:not(:disabled) { box-shadow: var(--shadow-pressed); }
+.presetChip:focus-visible { outline: 2px solid var(--color-marker-teal); outline-offset: 3px; }
+.presetChip:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: none; }
 .presetChip:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* Recessed input well */
+/* Scribble input: dashed ink well */
 .inputWrap {
   display: flex;
   align-items: flex-end;
   gap: var(--spacing-8);
-  background: var(--color-base);
+  background: var(--color-cream);
+  border: var(--border-doodle);
   border-radius: var(--radius-inputs);
-  box-shadow: var(--shadow-recessed);
+  box-shadow: 3px 3px 0 rgba(44, 44, 44, 0.16);
   padding: 12px 12px 12px var(--spacing-16);
-  transition: box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .inputWrap:focus-within {
-  /* Recess preserved, shadow tinted blurple — element does not move */
-  box-shadow:
-    inset 8px 8px 16px rgba(109, 93, 252, 0.22),
-    inset -8px -8px 16px var(--color-highlight);
+  /* Focus: ink stroke turns red + hard yellow shadow, no size change */
+  border-color: var(--color-marker-red);
+  box-shadow: var(--shadow-focus);
 }
 .inputDisabled { opacity: 0.65; }
 
@@ -71,8 +73,8 @@
   background: transparent;
   border: none;
   outline: none;
-  color: var(--color-text);
-  font-family: var(--font-sans);
+  color: var(--color-ink);
+  font-family: var(--font-body);
   font-size: var(--text-body);
   line-height: var(--leading-body);
   resize: none;
@@ -82,51 +84,64 @@
   scrollbar-width: none;
 }
 .textarea::-webkit-scrollbar { display: none; }
-.textarea::placeholder { color: var(--color-text-muted); }
+.textarea::placeholder { color: rgba(44, 44, 44, 0.3); }
 .textarea:disabled { cursor: not-allowed; }
 
-/* Raised action buttons */
+/* Doodle action buttons */
 .sendBtn,
 .stopBtn,
 .clearBtn {
   width: 38px;
   height: 38px;
   border-radius: var(--radius-buttons);
-  border: none;
+  border: var(--border-doodle);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  background: var(--color-base);
-  box-shadow: 4px 4px 8px var(--color-shadow-grey), -4px -4px 8px var(--color-highlight);
-  transition: box-shadow var(--transition-fast), color var(--transition-fast);
+  background: var(--color-cream);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-button);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
 }
-.sendBtn { color: var(--color-blurple); }
-.sendBtn:hover:not(:disabled) { box-shadow: var(--shadow-raised-hover); }
+.sendBtn svg,
+.stopBtn svg,
+.clearBtn svg { transition: transform var(--transition-fast); }
+.sendBtn:hover:not(:disabled) svg { transform: translate(2px, -2px) rotate(-8deg); }
+.stopBtn:hover:not(:disabled) svg { transform: rotate(-10deg); }
 .sendBtn:focus-visible,
 .stopBtn:focus-visible,
-.clearBtn:focus-visible { outline: 2px solid var(--color-blurple); outline-offset: 2px; }
+.clearBtn:focus-visible { outline: 2px solid var(--color-marker-teal); outline-offset: 3px; }
 .sendBtn:active:not(:disabled),
 .stopBtn:active,
-.clearBtn:active:not(:disabled) { box-shadow: var(--shadow-pressed); }
+.clearBtn:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: none; }
 
 .sendDisabled {
   color: var(--color-text-muted) !important;
-  box-shadow: var(--shadow-pressed) !important;
+  box-shadow: none !important;
   cursor: not-allowed !important;
 }
 
-/* stop: coral = destructive/irreversible */
-.stopBtn { color: var(--color-coral); }
-.stopBtn:hover { box-shadow: var(--shadow-raised-hover); }
+/* stop: marker red = destructive/irreversible */
+.stopBtn:hover:not(:disabled) {
+  background: var(--color-marker-red);
+  color: var(--color-cream);
+  transform: translate(-1px, -4px) rotate(1deg);
+  box-shadow: 5px 5px 0 var(--color-ink);
+}
 
-/* clear: neutral grey */
-.clearBtn { color: var(--color-text-muted); }
-.clearBtn:hover:not(:disabled) { color: var(--color-text); box-shadow: var(--shadow-raised-hover); }
+/* clear: neutral */
+.clearBtn:hover:not(:disabled) {
+  background: var(--color-ink);
+  color: var(--color-cream);
+  transform: translate(-1px, -3px);
+  box-shadow: 5px 5px 0 var(--color-marker-yellow);
+}
 .clearBtn:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .hint {
+  font-family: var(--font-body);
   font-size: var(--text-label);
   color: var(--color-text-muted);
   letter-spacing: 0.02em;

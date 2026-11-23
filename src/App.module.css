@@ -1,8 +1,7 @@
 /* ═══════════════════════════════════════════════════════════
-   App shell — Neumorphism (StyleKit)
-   One light source: top-left highlight, bottom-right shadow.
-   Panels share the base colour and are separated by shadows,
-   never by borders or solid fills.
+   App shell — Hand-drawn Doodle (StyleKit)
+   Notes pinned to a cream page: dashed ink outlines, solid
+   marker-offset shadows, tape strips, slight tilts.
    ═══════════════════════════════════════════════════════════ */
 
 .shell {
@@ -13,25 +12,24 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--color-base);
+  background: var(--color-cream);
   padding: var(--spacing-24);
 }
 
-/* Ambient light blobs removed: neumorphism has a single fixed light
-   source and no coloured glow. Elements kept in the DOM for structure. */
+/* Decorative tape/pin elements kept in the DOM for structure */
 .blob1,
 .blob2 {
   display: none;
 }
 
 /* ── Three-panel stage ─────────────────────────────────────
-   Panels are raised cards with a gap >= the shadow blur radius,
-   so the two shadow pairs never overlap and turn muddy.        */
+   Doodle cards with dashed ink borders + coloured solid shadows.
+   Gap >= shadow offset so shadow pairs never overlap.          */
 .stage {
   position: relative;
   z-index: 1;
   display: flex;
-  gap: var(--spacing-16);
+  gap: var(--spacing-24);
   width: min(1280px, 96vw);
   height: min(88vh, 840px);
   animation: stageIn 400ms cubic-bezier(.22, 1, .36, 1) both;
@@ -42,17 +40,34 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Middle: chat panel (raised card) ────────────────────── */
+/* ── Middle: chat panel (note card, tilted -0.5deg) ──────── */
 .chatPanel {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  background: var(--color-base);
+  background: var(--color-cream);
+  border: var(--border-doodle-thick);
   border-radius: var(--radius-cards);
-  box-shadow: var(--shadow-raised);
+  box-shadow: var(--shadow-note);
   min-width: 0;
   position: relative;
   overflow: hidden;
+  transform: rotate(-0.4deg);
+}
+
+/* Tape strip pinned over the top-left corner of the chat card */
+.chatPanel::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 32px;
+  width: 96px;
+  height: 24px;
+  background: rgba(255, 217, 61, 0.8);
+  transform: rotate(-4deg);
+  clip-path: polygon(0 22%, 6% 0, 12% 22%, 88% 22%, 94% 0, 100% 22%, 100% 78%, 94% 100%, 88% 78%, 12% 78%, 6% 100%, 0 78%);
+  pointer-events: none;
+  z-index: 5;
 }
 
 .chatWindowShell {
@@ -71,37 +86,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-base);
+  background: var(--color-cream);
 }
 .historySpinner {
-  width: 30px;
-  height: 30px;
-  border: 3px solid var(--color-shadow-grey);
-  border-top-color: var(--color-blurple);
-  border-radius: var(--radius-pills);
-  animation: historySpin .8s linear infinite;
+  width: 32px;
+  height: 32px;
+  border: 3px dashed var(--color-ink);
+  border-top-color: var(--color-marker-teal);
+  border-radius: var(--radius-doodles);
+  animation: historySpin 1s linear infinite;
 }
 @keyframes historySpin {
   to { transform: rotate(360deg); }
 }
 
 /* ── Right: code / trace panel — collapsible ──────────────
-   Collapsed by default; expands into a docked drawer with a
-   smooth width + slide transition. Negative margin cancels the
+   Collapsed by default; expands into a docked note card with
+   a width + slide transition. Negative margin cancels the
    stage gap so the chat panel reclaims the full width.        */
 .codePanel {
   flex: 0 0 0%;
-  margin-left: calc(-1 * var(--spacing-16));
+  margin-left: calc(-1 * var(--spacing-24));
   display: flex;
   flex-direction: column;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  border: var(--border-doodle-thick);
   border-radius: var(--radius-cards);
-  background: var(--color-base);
+  background: var(--color-cream);
   box-shadow: none;
   opacity: 0;
-  transform: translateX(24px);
+  transform: translateX(24px) rotate(0.6deg);
   pointer-events: none;
   visibility: hidden;
   transition: flex-basis 360ms cubic-bezier(.22, 1, .36, 1),
@@ -116,10 +132,10 @@
   flex-basis: 38%;
   margin-left: 0;
   opacity: 1;
-  transform: translateX(0);
+  transform: translateX(0) rotate(0.6deg);
   pointer-events: auto;
   visibility: visible;
-  box-shadow: var(--shadow-raised);
+  box-shadow: var(--shadow-note);
   transition-delay: 0s;
 }
 
@@ -128,7 +144,7 @@
 }
 
 /* Narrow screens: the inspector becomes an overlay drawer so the
-   chat panel stays usable. Falls back to a full-height sheet.    */
+   chat panel stays usable.                                      */
 @media (max-width: 900px) {
   .codePanel,
   .codePanelOpen {
@@ -140,14 +156,14 @@
     bottom: 0;
     z-index: 20;
     width: min(420px, 82vw);
-    box-shadow: var(--shadow-raised);
+    box-shadow: var(--shadow-note-hover);
   }
   .codePanel {
-    transform: translateX(105%);
+    transform: translateX(105%) rotate(0.6deg);
     opacity: 0;
   }
   .codePanelOpen {
-    transform: translateX(0);
+    transform: translateX(0) rotate(0.6deg);
     opacity: 1;
   }
 }
@@ -157,7 +173,7 @@
 }
 
 /* ── Header (inside chat panel) ─────────────────────────────
-   No border: a recessed underline strip separates it instead.  */
+   Dashed underline strip separates it from the message list. */
 .header {
   display: flex;
   align-items: center;
@@ -166,7 +182,7 @@
   padding: var(--spacing-16) var(--spacing-24);
   flex-shrink: 0;
   flex-wrap: wrap;
-  box-shadow: inset 0 -6px 12px -8px var(--color-shadow-grey);
+  border-bottom: 2px dashed var(--color-ink);
 }
 .headerActions {
   display: flex;
@@ -176,37 +192,40 @@
   min-width: 0;
 }
 
-/* Panel toggle: neumorphic raised pill with hover lift + press */
+/* Panel toggle: doodle button with hover invert + tilt */
 .panelToggle {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  border: none;
-  border-radius: var(--radius-pills);
-  background: var(--color-base);
-  color: var(--color-text-secondary);
+  border: var(--border-doodle);
+  border-radius: var(--radius-buttons);
+  background: var(--color-cream);
+  color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: var(--text-label);
-  font-weight: var(--fw-medium);
+  font-weight: var(--fw-extrabold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 4px 4px 8px var(--color-shadow-grey), -4px -4px 8px var(--color-highlight);
-  transition: box-shadow var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  box-shadow: var(--shadow-button);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
   white-space: nowrap;
   flex-shrink: 0;
 }
 .panelToggle:hover {
-  color: var(--color-blurple);
-  transform: translateY(-2px);
-  box-shadow: 6px 6px 12px var(--color-shadow-grey), -6px -6px 12px var(--color-highlight);
+  background: var(--color-ink);
+  color: var(--color-cream);
+  transform: translate(-1px, -4px) rotate(1deg);
+  box-shadow: 6px 6px 0 var(--color-marker-teal);
 }
-.panelToggle:active { transform: translateY(0); box-shadow: var(--shadow-pressed); }
-.panelToggle:focus-visible { outline: 2px solid var(--color-blurple); outline-offset: 2px; }
+.panelToggle:active { transform: translate(3px, 3px); box-shadow: none; }
+.panelToggle:focus-visible { outline: 2px solid var(--color-marker-teal); outline-offset: 3px; }
 .panelToggleActive {
-  color: var(--color-blurple);
-  box-shadow: var(--shadow-pressed);
+  background: var(--color-marker-yellow);
+  box-shadow: var(--shadow-button);
 }
-.panelToggleActive:hover { transform: none; box-shadow: var(--shadow-pressed); }
+.panelToggleActive:hover { background: var(--color-ink); }
 .panelToggleLabel { line-height: 1; }
 
 @media (max-width: 640px) {
@@ -227,27 +246,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
-  color: var(--color-blurple);
+  font-size: 1.2rem;
+  color: var(--color-marker-red);
   line-height: 1;
-  border-radius: var(--radius-buttons);
-  background: var(--color-base);
-  box-shadow: var(--shadow-raised);
+  border: var(--border-doodle);
+  border-radius: var(--radius-doodles);
+  background: var(--color-cream);
+  transform: rotate(-3deg);
 }
 .title {
   font-family: var(--font-sans);
-  font-size: var(--text-body);
-  font-weight: var(--fw-semibold);
-  color: var(--color-text);
-  letter-spacing: 0;
-  text-transform: none;
+  font-size: var(--text-body-lg);
+  font-weight: var(--fw-extrabold);
+  color: var(--color-ink);
+  letter-spacing: var(--tracking-display);
+  transform: rotate(-3deg);
+  transform-origin: left center;
+  display: inline-block;
 }
 .subtitle {
+  font-family: var(--font-body);
   font-size: var(--text-label);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {

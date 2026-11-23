@@ -1,7 +1,8 @@
 /* ═══════════════════════════════════════════════════════════
-   CodeViewer — Neumorphism
-   Recessed code well on the shared base; restrained syntax colours
-   derived from the StyleKit palette. No CRT scanlines or amber.
+   CodeViewer — Hand-drawn Doodle
+   A pinned sketch of handler.py: dashed file header, notebook
+   ruled code well, marker-coloured syntax. No monospace —
+   Nunito with tabular figures keeps columns readable.
    ═══════════════════════════════════════════════════════════ */
 
 .panel {
@@ -20,6 +21,7 @@
   justify-content: space-between;
   padding: var(--spacing-16) var(--spacing-24);
   flex-shrink: 0;
+  border-bottom: 2px dashed var(--color-ink);
 }
 .headerLeft {
   display: flex;
@@ -28,57 +30,66 @@
   min-width: 0;
 }
 .fileIcon {
-  font-size: 1rem;
-  color: var(--color-blurple);
+  font-size: 1.1rem;
+  color: var(--color-marker-red);
+  transform: rotate(-6deg);
+  display: inline-block;
 }
 .filename {
   font-family: var(--font-sans);
   font-size: var(--text-body);
-  font-weight: var(--fw-medium);
-  color: var(--color-text);
+  font-weight: var(--fw-extrabold);
+  color: var(--color-ink);
   white-space: nowrap;
+  transform: rotate(-2deg);
+  display: inline-block;
 }
 .badge {
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: var(--fw-extrabold);
   letter-spacing: var(--tracking-label);
-  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  color: var(--color-ink);
   padding: 4px 10px;
-  border-radius: var(--radius-pills);
-  background: var(--color-base);
-  box-shadow: var(--shadow-recessed);
+  border: var(--border-doodle);
+  border-radius: var(--radius-buttons);
+  background: var(--color-marker-yellow);
+  transform: rotate(2deg);
   flex-shrink: 0;
 }
 
-/* ── Body: recessed well ───────────────────────────────────── */
+/* ── Body: notebook well ───────────────────────────────────── */
 .body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
-  margin: 0 var(--spacing-16);
+  margin: var(--spacing-16);
   padding: var(--spacing-16) 0;
-  border-radius: var(--radius-buttons);
-  background: var(--color-base);
-  box-shadow: var(--shadow-recessed);
+  border: 2px dashed var(--color-ink);
+  border-radius: var(--radius-cards);
+  background: var(--color-cream);
 }
 
-/* Kept for DOM compatibility; no scanline in neumorphism */
+/* Kept for DOM compatibility; no scanline in doodle */
 .scanline { display: none; }
 
 /* ── Code ──────────────────────────────────────────────────── */
 .code {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
   font-size: var(--text-label);
-  line-height: 1.85;
+  font-weight: var(--fw-semibold);
+  line-height: 1.75;
   padding: 0 var(--spacing-16) 0 0;
 }
 
 .line {
   display: flex;
   align-items: baseline;
-  animation: lineIn 220ms ease-out both;
+  animation: lineIn 220ms linear both;
 }
 
 /* Subtle stagger (first 24 lines) */
@@ -108,8 +119,8 @@
 .line:nth-child(24) { animation-delay: 250ms; }
 
 @keyframes lineIn {
-  from { opacity: 0; transform: translateX(-3px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateX(-3px) rotate(-1deg); }
+  to   { opacity: 1; transform: translateX(0) rotate(0); }
 }
 
 /* Line number gutter */
@@ -119,43 +130,42 @@
   padding-right: 12px;
   text-align: right;
   color: var(--color-text-muted);
-  opacity: 0.7;
+  font-size: 11px;
   user-select: none;
-  font-size: 10px;
   flex-shrink: 0;
 }
 
 /* Line content */
 .lc {
   flex: 1;
-  color: var(--color-text);
+  color: var(--color-ink);
   white-space: pre-wrap;
   word-break: break-all;
 }
 
 .indent { display: inline-block; width: 2.2ch; }
 
-/* ── Syntax tokens: low-saturation, palette-derived ───────── */
-.cmt { color: #8b93a1; font-style: italic; }          /* grey */
-.dec { color: var(--color-blurple); }                 /* blurple */
-.kw  { color: #7c6bd6; }                              /* soft violet */
-.fn  { color: var(--color-text); font-weight: var(--fw-semibold); }
-.ty  { color: #3d8b86; }                              /* mint-family teal */
-.str { color: #4a8f52; }                              /* muted green */
-.doc { color: #8b93a1; font-style: italic; }
+/* ── Syntax tokens: marker-pen colours ────────────────────── */
+.cmt { color: #8a8d82; font-style: italic; }                 /* faded pencil */
+.dec { color: var(--color-marker-red); font-weight: var(--fw-extrabold); }
+.kw  { color: var(--color-olive); }                           /* dark olive */
+.fn  { color: var(--color-ink); font-weight: var(--fw-extrabold); }
+.ty  { color: var(--color-marker-teal); }
+.str { color: #b06a1f; }
+.doc { color: #8a8d82; font-style: italic; }
 .op  { color: var(--color-text-secondary); }
-.va  { color: var(--color-text); }
+.va  { color: var(--color-ink); }
 
 /* ── Cursor ────────────────────────────────────────────────── */
 .cursor {
   display: inline-block;
   width: 6px;
   height: 0.9em;
-  background: var(--color-blurple);
+  background: var(--color-marker-red);
   margin-left: 2px;
   vertical-align: text-bottom;
-  animation: blink 1.1s step-end infinite;
-  border-radius: 1px;
+  animation: blink 1.1s linear infinite;
+  border-radius: var(--radius-doodles);
 }
 @keyframes blink {
   0%, 100% { opacity: 1; }
@@ -169,23 +179,26 @@
   gap: var(--spacing-8);
   padding: var(--spacing-16) var(--spacing-24);
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: var(--fw-extrabold);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   flex-shrink: 0;
+  border-top: 2px dashed var(--color-ink);
 }
 .footerDot {
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-pills);
-  background: var(--color-mint);
-  box-shadow: 1px 1px 2px var(--color-shadow-grey);
-  animation: pulse 2.4s ease-in-out infinite;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-doodles);
+  background: var(--color-marker-teal);
+  border: 1px dashed var(--color-ink);
+  transform: rotate(12deg);
+  animation: pulse 2.4s linear infinite;
 }
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.5; }
+  0%, 100% { opacity: 1; transform: rotate(12deg) scale(1); }
+  50%      { opacity: 0.5; transform: rotate(12deg) scale(0.8); }
 }
 
 @media (prefers-reduced-motion: reduce) {

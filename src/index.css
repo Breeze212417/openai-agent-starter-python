@@ -1,13 +1,10 @@
 /*
- * Neumorphism (新拟物派) — global design tokens
+ * Hand-drawn Doodle — global design tokens (StyleKit)
  * ------------------------------------------------------------
- * StyleKit "neumorphism": one fixed light source (top-left white
- * highlight, bottom-right cool-grey shadow). Every element shares the
- * base colour #e0e5ec; hierarchy comes from shadows only, never from
- * borders or solid fills. Blurple is the single saturated accent.
- *
- * The legacy variable names below are kept as aliases so existing CSS
- * Modules inherit the new look without touching component logic.
+ * A page from a notebook: cream paper, dashed ink outlines,
+ * solid marker-offset shadows (never blurred grey), tape strips
+ * and pushpins. Headings tilt -3deg; cards tilt on hover.
+ * Baloo 2 / Nunito, no monospace, no gradients, 2px radius.
  */
 
 *, *::before, *::after {
@@ -17,38 +14,47 @@
 }
 
 :root {
-  /* ---- StyleKit palette ---- */
-  --color-base: #e0e5ec;
-  --color-shadow-grey: #b8bcc2;
-  --color-highlight: #ffffff;
-  --color-blurple: #6d5dfc;
-  --color-coral: #ff6b6b;
-  --color-mint: #4ecdc4;
-  --color-text: #3d4451;
-  --color-text-secondary: #6b7280;
-  --color-text-muted: #98a0ac;
+  /* ---- Palette ---- */
+  --color-ink: #2c2c2c;
+  --color-cream: #fffef5;
+  --color-marker-red: #ff6b6b;
+  --color-marker-teal: #4ecdc4;
+  --color-marker-yellow: #ffd93d;
+  --color-olive: #a98d16;
 
-  /* ---- Elevation: raised = outer pair, recessed = inset pair ---- */
-  --shadow-raised: 8px 8px 16px var(--color-shadow-grey), -8px -8px 16px var(--color-highlight);
-  --shadow-recessed: inset 8px 8px 16px var(--color-shadow-grey), inset -8px -8px 16px var(--color-highlight);
-  --shadow-raised-hover: 4px 4px 8px var(--color-shadow-grey), -4px -4px 8px var(--color-highlight);
-  --shadow-pressed: inset 4px 4px 8px var(--color-shadow-grey), inset -4px -4px 8px var(--color-highlight);
+  /* ---- Legacy aliases → doodle palette (keep components working) ---- */
+  --color-base: var(--color-cream);
+  --color-text: var(--color-ink);
+  --color-text-secondary: #5c5f57;
+  --color-text-muted: #8a8d82;
+  --color-blurple: var(--color-marker-teal);   /* links / secondary accent = teal */
+  --color-coral: var(--color-marker-red);      /* destructive / primary shadow = red */
+  --color-mint: var(--color-marker-teal);
+  --color-shadow-grey: var(--color-ink);       /* dashed ink stroke */
+  --color-highlight: transparent;              /* no highlight in doodle */
 
-  /* ---- Typography: Inter is the only family; weights stay <= 600 ---- */
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --text-display: 36px;
-  --text-heading: 28px;
-  --text-subheading: 20px;
-  --text-body-lg: 16px;
-  --text-body: 14px;
-  --text-label: 12px;
-  --leading-display: 1.15;
-  --leading-heading: 1.3;
-  --leading-body: 1.6;
-  --tracking-label: 0.08em;
+  /* ---- Typography ---- */
+  --font-sans: 'Baloo 2', 'Comic Sans MS', 'Trebuchet MS', sans-serif;
+  --font-body: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  /* Legacy single-font alias: headings + labels use Baloo, body overrides below */
+  --font-display: var(--font-sans);
+  --font-mono: var(--font-body);               /* never monospace in doodle */
+
+  --text-display: 44px;
+  --text-heading: 32px;
+  --text-subheading: 24px;
+  --text-body-lg: 18px;
+  --text-body: 16px;
+  --text-label: 14px;
+  --leading-display: 1.1;
+  --leading-heading: 1.15;
+  --leading-body: 1.65;
+  --tracking-display: 0.02em;
+  --tracking-label: 0.12em;
   --fw-regular: 400;
-  --fw-medium: 500;
+  --fw-medium: 600;
   --fw-semibold: 600;
+  --fw-extrabold: 800;
 
   /* ---- Spacing (8px base) ---- */
   --spacing-8: 8px;
@@ -59,49 +65,63 @@
   --spacing-64: 64px;
   --spacing-96: 96px;
 
-  /* ---- Radius ---- */
-  --radius-cards: 24px;
-  --radius-buttons: 16px;
-  --radius-inputs: 16px;
-  --radius-pills: 999px;
+  /* ---- Layout ---- */
+  --page-max-width: 1080px;
+  --section-gap: 96px;
+  --card-padding: 32px;
+  --element-gap: 24px;
 
-  /* ---- Legacy aliases → new tokens (keep components working) ---- */
-  --bg-base: var(--color-base);
-  --bg-surface: var(--color-base);
-  --bg-elevated: var(--color-base);
-  --bg-border: transparent;                 /* no solid borders in neumorphism */
-  --text-primary: var(--color-text);
-  --text-secondary: var(--color-text-secondary);
-  --text-muted: var(--color-text-muted);
+  /* ---- Radius: near-square, doodle blobs only for decoration ---- */
+  --radius-cards: 2px;
+  --radius-buttons: 2px;
+  --radius-inputs: 2px;
+  --radius-pills: 999px;                       /* used for tape/pin dots only */
+  --radius-doodles: 60% 40% 50% 50%;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
 
-  --accent-gold: var(--color-blurple);      /* primary action = blurple */
-  --accent-gold-dim: rgba(109, 93, 252, .10);
-  --accent-gold-glow: transparent;          /* no glow in this style */
+  /* ---- Doodle borders: 2–3px dashed ink, never solid ---- */
+  --border-doodle: 2px dashed var(--color-ink);
+  --border-doodle-thick: 3px dashed var(--color-ink);
 
-  --user-bubble: var(--color-base);
-  --user-border: transparent;
-  --bot-bubble: var(--color-base);
-  --bot-border: transparent;
+  /* ---- Elevation: solid marker offsets, zero blur ---- */
+  --shadow-note: 5px 5px 0 var(--color-marker-yellow);
+  --shadow-note-hover: 8px 8px 0 var(--color-marker-red);
+  --shadow-button: 4px 4px 0 var(--color-marker-red);
+  --shadow-button-hover: 6px 6px 0 var(--color-marker-teal);
+  --shadow-focus: 2px 2px 0 var(--color-marker-yellow);
 
-  --font-display: var(--font-sans);
-  --font-mono: var(--font-sans);            /* Inter everywhere */
+  /* Legacy shadow aliases → doodle elevations */
+  --shadow-raised: var(--shadow-note);
+  --shadow-raised-hover: var(--shadow-note-hover);
+  --shadow-recessed: 3px 3px 0 rgba(44, 44, 44, 0.18);  /* subtle pressed note */
+  --shadow-pressed: none;
+  --shadow-card: var(--shadow-note);
+  --accent-gold: var(--color-marker-teal);
+  --accent-gold-dim: rgba(78, 205, 196, 0.14);
+  --accent-gold-glow: transparent;
+  --user-bubble: var(--color-cream);
+  --user-border: var(--border-doodle);
+  --bot-bubble: var(--color-cream);
+  --bot-border: var(--border-doodle);
+  --bg-base: var(--color-cream);
+  --bg-surface: var(--color-cream);
+  --bg-elevated: var(--color-cream);
+  --bg-border: var(--color-ink);
 
-  --radius-sm: 16px;
-  --radius-md: 20px;
-  --radius-lg: 24px;
-  --radius-xl: 28px;
-
-  --shadow-card: var(--shadow-raised);
-  --transition-fast: 200ms ease-out;
-  --transition-med: 200ms ease-out;
+  /* ---- Motion: 150ms linear everywhere in doodle ---- */
+  --transition-fast: 150ms linear;
+  --transition-med: 150ms linear;
 }
 
 html, body, #root {
   height: 100%;
   width: 100%;
-  background: var(--color-base);
-  color: var(--color-text);
-  font-family: var(--font-sans);
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-body);
   font-size: var(--text-body);
   line-height: var(--leading-body);
   font-weight: var(--fw-regular);
@@ -109,22 +129,22 @@ html, body, #root {
   overflow: hidden;
 }
 
-/* Numbers align naturally in code / metrics without a second font family */
+/* Numbers: no monospace — tabular figures keep alignment */
 code, pre, .tabular {
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- Scrollbar: neutral, same-material thumb ---- */
-::-webkit-scrollbar { width: 8px; height: 8px; }
+/* ---- Scrollbar: hand-drawn ink thumb on paper ---- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-shadow-grey);
-  border-radius: var(--radius-pills);
-  border: 2px solid var(--color-base);
+  background: var(--color-ink);
+  border-radius: var(--radius-doodles);
+  border: 2px solid var(--color-cream);
 }
-::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-marker-teal); }
 
-/* ---- Language toggle: raised pill ---- */
+/* ---- Language toggle: doodle button ---- */
 .lang-toggle {
   position: fixed;
   top: 16px;
@@ -133,42 +153,48 @@ code, pre, .tabular {
   display: flex;
   align-items: center;
   gap: var(--spacing-8);
-  padding: var(--spacing-8) var(--spacing-16);
-  border: none;
-  border-radius: var(--radius-pills);
-  background: var(--color-base);
-  box-shadow: 4px 4px 8px var(--color-shadow-grey), -4px -4px 8px var(--color-highlight);
-  color: var(--color-text-secondary);
+  padding: 8px 14px;
+  border: var(--border-doodle);
+  border-radius: var(--radius-buttons);
+  background: var(--color-cream);
+  box-shadow: var(--shadow-button);
+  color: var(--color-ink);
   font-family: var(--font-sans);
-  cursor: pointer;
-  transition: box-shadow var(--transition-fast), color var(--transition-fast);
+  font-size: var(--text-label);
+  font-weight: var(--fw-extrabold);
   line-height: 1;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
 }
 .lang-toggle:hover {
-  box-shadow: var(--shadow-raised-hover);
+  transform: translate(-1px, -4px) rotate(1deg);
+  background: var(--color-ink);
+  color: var(--color-cream);
+  box-shadow: 6px 6px 0 var(--color-marker-teal);
 }
 .lang-toggle:active {
-  box-shadow: var(--shadow-pressed);
+  transform: translate(3px, 3px);
+  box-shadow: none;
 }
 .lang-toggle:focus-visible {
-  outline: 2px solid var(--color-blurple);
+  outline: 2px solid var(--color-marker-teal);
   outline-offset: 3px;
 }
 .lang-toggle__label {
   display: inline-block;
   font-family: var(--font-sans);
   font-size: var(--text-label);
-  font-weight: var(--fw-medium);
+  font-weight: var(--fw-semibold);
   color: var(--color-text-muted);
   letter-spacing: var(--tracking-label);
-  transition: font-size var(--transition-fast), color var(--transition-fast), font-weight var(--transition-fast);
   text-transform: uppercase;
+  transition: color var(--transition-fast), font-weight var(--transition-fast);
 }
 .lang-toggle__label--active {
-  font-size: var(--text-body);
-  font-weight: var(--fw-semibold);
-  color: var(--color-blurple);
+  font-weight: var(--fw-extrabold);
+  color: inherit;
 }
+.lang-toggle:hover .lang-toggle__label--active { color: var(--color-cream); }
 .lang-toggle__sep {
   font-family: var(--font-sans);
   font-size: var(--text-label);
@@ -176,6 +202,18 @@ code, pre, .tabular {
   opacity: 0.5;
   margin: 0 2px;
   user-select: none;
+}
+
+/* ---- Reusable tape strip: translucent marker-yellow, jagged ends ---- */
+.tape {
+  position: absolute;
+  width: 96px;
+  height: 24px;
+  background: rgba(255, 217, 61, 0.8);
+  transform: rotate(-4deg);
+  clip-path: polygon(0 22%, 6% 0, 12% 22%, 88% 22%, 94% 0, 100% 22%, 100% 78%, 94% 100%, 88% 78%, 12% 78%, 6% 100%, 0 78%);
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* ---- Global reduced-motion fallback (Implementation Contract) ---- */

@@ -1,61 +1,67 @@
 /* ═══════════════════════════════════════════════════════════
-   ChatBubble — Neumorphism
-   Bot bubble raised, user bubble recessed. Both same base colour;
-   role is conveyed by shadow direction, never by a different fill.
+   ChatBubble — Hand-drawn Doodle
+   Bot = red marker note, user = yellow marker note, both with
+   dashed ink outlines. Marker-pen avatar, doodle markdown.
    ═══════════════════════════════════════════════════════════ */
 
 .row {
   display: flex;
   align-items: flex-end;
   gap: var(--spacing-16);
-  animation: fadeUp 200ms ease-out both;
+  animation: fadeUp 200ms linear both;
   max-width: 100%;
 }
 .botRow  { justify-content: flex-start; }
 .userRow { justify-content: flex-end; }
 
 .avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-buttons);
-  background: var(--color-base);
-  box-shadow: 4px 4px 8px var(--color-shadow-grey), -4px -4px 8px var(--color-highlight);
+  width: 38px;
+  height: 38px;
+  border: var(--border-doodle);
+  border-radius: var(--radius-doodles);
+  background: var(--color-cream);
+  box-shadow: 3px 3px 0 var(--color-marker-teal);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
-  color: var(--color-blurple);
+  font-size: 1rem;
+  color: var(--color-marker-red);
   flex-shrink: 0;
   font-family: var(--font-sans);
-  font-weight: var(--fw-semibold);
+  font-weight: var(--fw-extrabold);
+  transform: rotate(-4deg);
 }
 .userAvatar {
-  color: var(--color-text-secondary);
+  color: var(--color-ink);
   font-size: var(--text-label);
+  transform: rotate(4deg);
+  box-shadow: 3px 3px 0 var(--color-marker-yellow);
 }
 
 .bubble {
   position: relative;
   max-width: 72%;
   padding: 14px 18px 26px;
+  border: var(--border-doodle);
   border-radius: var(--radius-cards);
+  font-family: var(--font-body);
   font-size: var(--text-body);
   line-height: var(--leading-body);
   word-break: break-word;
 }
 
 .botBubble {
-  background: var(--color-base);
-  box-shadow: var(--shadow-raised);
-  color: var(--color-text);
-  border-bottom-left-radius: var(--spacing-8);
+  background: var(--color-cream);
+  box-shadow: 5px 5px 0 var(--color-marker-red);
+  color: var(--color-ink);
+  transform: rotate(-0.35deg);
 }
 
 .userBubble {
-  background: var(--color-base);
-  box-shadow: var(--shadow-recessed);
-  color: var(--color-text);
-  border-bottom-right-radius: var(--spacing-8);
+  background: var(--color-marker-yellow);
+  box-shadow: 5px 5px 0 var(--color-ink);
+  color: var(--color-ink);
+  transform: rotate(0.4deg);
   white-space: pre-wrap;
 }
 
@@ -63,7 +69,8 @@
   position: absolute;
   bottom: 6px;
   right: 12px;
-  font-size: 10px;
+  font-family: var(--font-body);
+  font-size: 11px;
   color: var(--color-text-muted);
 }
 
@@ -75,13 +82,14 @@
 /* ── Markdown rendered content ── */
 .markdown {
   line-height: var(--leading-body);
+  font-family: var(--font-body);
 }
 .markdown :global(p) { margin: 0.5em 0; }
 .markdown :global(p:first-child) { margin-top: 0; }
 .markdown :global(p:last-child) { margin-bottom: 0; }
 .markdown :global(strong) {
-  color: var(--color-text);
-  font-weight: var(--fw-semibold);
+  color: var(--color-ink);
+  font-weight: var(--fw-extrabold);
 }
 .markdown :global(em) { font-style: italic; }
 .markdown :global(h1),
@@ -89,8 +97,9 @@
 .markdown :global(h3),
 .markdown :global(h4) {
   margin: 0.7em 0 0.35em;
-  font-weight: var(--fw-semibold);
-  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-weight: var(--fw-extrabold);
+  color: var(--color-ink);
 }
 .markdown :global(h1) { font-size: var(--text-body-lg); }
 .markdown :global(h2) { font-size: var(--text-body); }
@@ -103,84 +112,88 @@
 }
 .markdown :global(li) { margin: 0.25em 0; padding-left: 0.15em; }
 
-/* Inline code: recessed chip, no border */
+/* Inline code: dashed chip, no fill */
 .markdown :global(code) {
-  background: var(--color-base);
-  box-shadow: var(--shadow-pressed);
-  border-radius: var(--radius-sm);
+  background: var(--color-cream);
+  border: 1px dashed var(--color-ink);
+  border-radius: var(--radius-buttons);
   padding: 0.15em 0.4em;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: 0.88em;
-  color: var(--color-blurple);
+  color: var(--color-marker-teal);
 }
 .markdown :global(pre) {
-  background: var(--color-base);
-  box-shadow: var(--shadow-recessed);
+  background: var(--color-cream);
+  border: var(--border-doodle);
   border-radius: var(--radius-buttons);
+  box-shadow: 3px 3px 0 var(--color-marker-yellow);
   padding: 12px 14px;
   overflow-x: auto;
   margin: 0.6em 0;
 }
 .markdown :global(pre code) {
-  box-shadow: none;
+  border: none;
   background: transparent;
   padding: 0;
   font-size: 0.85em;
-  color: var(--color-text);
+  color: var(--color-ink);
 }
 .markdown :global(blockquote) {
-  border-left: 3px solid var(--color-blurple);
+  border-left: 3px dashed var(--color-marker-teal);
   padding-left: 12px;
   margin: 0.5em 0;
   color: var(--color-text-secondary);
 }
 
-/* Tables: recessed well with subtle cell separators */
+/* Tables: dashed grid, yellow header highlight */
 .markdown :global(table) {
   border-collapse: separate;
   border-spacing: 0;
   margin: 0.6em 0;
   font-size: 0.86em;
   width: 100%;
+  border: var(--border-doodle);
   border-radius: var(--radius-buttons);
   overflow: hidden;
-  box-shadow: var(--shadow-recessed);
 }
 .markdown :global(th),
 .markdown :global(td) {
   padding: 0.45em 0.7em;
   text-align: left;
-  border-bottom: 1px solid rgba(184, 188, 194, 0.4);
+  border-bottom: 1px dashed var(--color-ink);
+  border-right: 1px dashed var(--color-ink);
 }
+.markdown :global(th:last-child),
+.markdown :global(td:last-child) { border-right: none; }
 .markdown :global(th) {
-  font-weight: var(--fw-semibold);
-  color: var(--color-text);
-  background: rgba(255, 255, 255, 0.25);
+  font-weight: var(--fw-extrabold);
+  color: var(--color-ink);
+  background: var(--color-marker-yellow);
 }
 .markdown :global(tr:last-child td) { border-bottom: none; }
 .markdown :global(hr) {
   border: none;
-  border-top: 2px solid var(--color-shadow-grey);
+  border-top: 2px dashed var(--color-ink);
   margin: 0.9em 0;
-  border-radius: var(--radius-pills);
 }
 .markdown :global(a) {
-  color: var(--color-blurple);
+  color: var(--color-marker-teal);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-style: wavy;
+  text-underline-offset: 3px;
 }
 
-/* Streaming caret — inline at end of last markdown block */
+/* Streaming caret — marker-red pen stroke at end of last block */
 .markdownStreaming > *:last-child::after {
   content: '';
   display: inline-block;
   width: 0.5em;
-  height: 1.05em;
+  height: 0.12em;
   margin-left: 3px;
-  vertical-align: -0.18em;
-  background: var(--color-blurple);
-  border-radius: 2px;
-  animation: streamingCaretBlink 0.7s ease-in-out infinite;
+  vertical-align: 0.1em;
+  background: var(--color-marker-red);
+  border-radius: var(--radius-doodles);
+  animation: streamingCaretBlink 0.7s linear infinite;
 }
 @keyframes streamingCaretBlink {
   0%, 100% { opacity: 1; }
