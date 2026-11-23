@@ -70,20 +70,26 @@ export default memo(function ChatBubble({ message }: Props) {
 
   if (!isUser && !message.content) return null;
 
+  const time = (
+    <time className={styles.time} dateTime={new Date(message.timestamp).toISOString()}>
+      {new Date(message.timestamp).toLocaleTimeString(lang === 'zh' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+    </time>
+  );
+
   return (
     <div className={`${styles.row} ${isUser ? styles.userRow : styles.botRow}`}>
       {!isUser && <div className={styles.avatar}>⬡</div>}
-      <div className={`${styles.bubble} ${isUser ? styles.userBubble : styles.botBubble}`}>
-        {isUser ? (
-          message.content
-        ) : (
-          <div className={`${styles.markdown} ${message.streaming ? styles.markdownStreaming : ''}`}>
-            <Markdown remarkPlugins={[remarkGfm]}>{normalizeMarkdown(message.content)}</Markdown>
-          </div>
-        )}
-        <span className={styles.time}>
-          {new Date(message.timestamp).toLocaleTimeString(lang === 'zh' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
-        </span>
+      <div className={`${styles.messageGroup} ${isUser ? styles.userGroup : styles.botGroup}`}>
+        {time}
+        <div className={`${styles.bubble} ${isUser ? styles.userBubble : styles.botBubble}`}>
+          {isUser ? (
+            message.content
+          ) : (
+            <div className={`${styles.markdown} ${message.streaming ? styles.markdownStreaming : ''}`}>
+              <Markdown remarkPlugins={[remarkGfm]}>{normalizeMarkdown(message.content)}</Markdown>
+            </div>
+          )}
+        </div>
       </div>
       {isUser && <div className={`${styles.avatar} ${styles.userAvatar}`}>U</div>}
     </div>
