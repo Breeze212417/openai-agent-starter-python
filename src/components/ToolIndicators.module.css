@@ -1,3 +1,7 @@
+/* ═══════════════════════════════════════════════════════════
+   ToolIndicators — Neumorphism
+   ═══════════════════════════════════════════════════════════ */
+
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -7,24 +11,22 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-8);
   flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
-.hint {
-  margin: 18px 0 0;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.35);
-  letter-spacing: 0.5px;
-}
-
-/* Stagger each lamp's initial appearance on page load */
-.row > *:nth-child(1) { animation: lampIn 420ms cubic-bezier(.34,1.4,.64,1) 80ms  both; }
-.row > *:nth-child(2) { animation: lampIn 420ms cubic-bezier(.34,1.4,.64,1) 160ms both; }
-.row > *:nth-child(3) { animation: lampIn 420ms cubic-bezier(.34,1.4,.64,1) 240ms both; }
-.row > *:nth-child(4) { animation: lampIn 420ms cubic-bezier(.34,1.4,.64,1) 320ms both; }
+/* Stagger initial appearance, kept subtle */
+.row > *:nth-child(1) { animation: lampIn 260ms ease-out 40ms  both; }
+.row > *:nth-child(2) { animation: lampIn 260ms ease-out 80ms  both; }
+.row > *:nth-child(3) { animation: lampIn 260ms ease-out 120ms both; }
+.row > *:nth-child(4) { animation: lampIn 260ms ease-out 160ms both; }
 
 @keyframes lampIn {
-  from { opacity: 0; transform: translateY(-6px) scale(.9); }
-  to   { opacity: 1; transform: translateY(0)    scale(1);  }
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row > * { animation: none !important; }
 }

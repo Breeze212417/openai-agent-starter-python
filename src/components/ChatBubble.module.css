@@ -1,55 +1,61 @@
+/* ═══════════════════════════════════════════════════════════
+   ChatBubble — Neumorphism
+   Bot bubble raised, user bubble recessed. Both same base colour;
+   role is conveyed by shadow direction, never by a different fill.
+   ═══════════════════════════════════════════════════════════ */
+
 .row {
   display: flex;
   align-items: flex-end;
-  gap: 10px;
-  animation: fadeUp .25s ease both;
+  gap: var(--spacing-16);
+  animation: fadeUp 200ms ease-out both;
   max-width: 100%;
 }
 .botRow  { justify-content: flex-start; }
 .userRow { justify-content: flex-end; }
 
 .avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--bg-elevated);
-  border: 1px solid var(--bg-border);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-buttons);
+  background: var(--color-base);
+  box-shadow: 4px 4px 8px var(--color-shadow-grey), -4px -4px 8px var(--color-highlight);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: .8rem;
-  color: var(--accent-gold);
+  font-size: 0.95rem;
+  color: var(--color-blurple);
   flex-shrink: 0;
-  font-family: var(--font-display);
-  font-weight: 700;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
 }
 .userAvatar {
-  color: var(--text-secondary);
-  font-size: .65rem;
+  color: var(--color-text-secondary);
+  font-size: var(--text-label);
 }
 
 .bubble {
   position: relative;
-  max-width: 68%;
-  padding: 12px 16px 24px;
-  border-radius: var(--radius-md);
-  font-size: .82rem;
-  line-height: 1.65;
+  max-width: 72%;
+  padding: 14px 18px 26px;
+  border-radius: var(--radius-cards);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   word-break: break-word;
 }
 
 .botBubble {
-  background: var(--bot-bubble);
-  border: 1px solid var(--bot-border);
-  color: var(--text-primary);
-  border-radius: var(--radius-md) var(--radius-md) var(--radius-md) 4px;
+  background: var(--color-base);
+  box-shadow: var(--shadow-raised);
+  color: var(--color-text);
+  border-bottom-left-radius: var(--spacing-8);
 }
 
 .userBubble {
-  background: var(--user-bubble);
-  border: 1px solid var(--user-border);
-  color: var(--text-primary);
-  border-radius: var(--radius-md) var(--radius-md) 4px var(--radius-md);
+  background: var(--color-base);
+  box-shadow: var(--shadow-recessed);
+  color: var(--color-text);
+  border-bottom-right-radius: var(--spacing-8);
   white-space: pre-wrap;
 }
 
@@ -57,117 +63,114 @@
   position: absolute;
   bottom: 6px;
   right: 12px;
-  font-size: .6rem;
-  color: var(--text-muted);
-  letter-spacing: .04em;
+  font-size: 10px;
+  color: var(--color-text-muted);
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Markdown rendered content ── */
 .markdown {
-  line-height: 1.7;
+  line-height: var(--leading-body);
 }
-.markdown :global(p) {
-  margin: 0.4em 0;
-}
-.markdown :global(p:first-child) {
-  margin-top: 0;
-}
-.markdown :global(p:last-child) {
-  margin-bottom: 0;
-}
+.markdown :global(p) { margin: 0.5em 0; }
+.markdown :global(p:first-child) { margin-top: 0; }
+.markdown :global(p:last-child) { margin-bottom: 0; }
 .markdown :global(strong) {
-  color: var(--text-primary);
-  font-weight: 600;
+  color: var(--color-text);
+  font-weight: var(--fw-semibold);
 }
-.markdown :global(em) {
-  font-style: italic;
-}
+.markdown :global(em) { font-style: italic; }
 .markdown :global(h1),
 .markdown :global(h2),
 .markdown :global(h3),
 .markdown :global(h4) {
-  margin: 0.6em 0 0.3em;
-  font-weight: 600;
-  color: var(--text-primary);
+  margin: 0.7em 0 0.35em;
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
 }
-.markdown :global(h1) { font-size: 1.1em; }
-.markdown :global(h2) { font-size: 1.0em; }
-.markdown :global(h3) { font-size: 0.95em; }
+.markdown :global(h1) { font-size: var(--text-body-lg); }
+.markdown :global(h2) { font-size: var(--text-body); }
+.markdown :global(h3) { font-size: var(--text-body); }
 .markdown :global(ul),
 .markdown :global(ol) {
-  margin: 0.4em 0;
+  margin: 0.5em 0;
   padding-left: 2em;
   list-style-position: outside;
 }
-.markdown :global(li) {
-  margin: 0.2em 0;
-  padding-left: 0.15em;
-}
+.markdown :global(li) { margin: 0.25em 0; padding-left: 0.15em; }
+
+/* Inline code: recessed chip, no border */
 .markdown :global(code) {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--bg-border);
-  border-radius: 4px;
+  background: var(--color-base);
+  box-shadow: var(--shadow-pressed);
+  border-radius: var(--radius-sm);
   padding: 0.15em 0.4em;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 0.88em;
+  color: var(--color-blurple);
 }
 .markdown :global(pre) {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--bg-border);
-  border-radius: 6px;
-  padding: 10px 14px;
+  background: var(--color-base);
+  box-shadow: var(--shadow-recessed);
+  border-radius: var(--radius-buttons);
+  padding: 12px 14px;
   overflow-x: auto;
-  margin: 0.5em 0;
+  margin: 0.6em 0;
 }
 .markdown :global(pre code) {
-  background: none;
-  border: none;
+  box-shadow: none;
+  background: transparent;
   padding: 0;
-  font-size: 0.82em;
+  font-size: 0.85em;
+  color: var(--color-text);
 }
 .markdown :global(blockquote) {
-  border-left: 3px solid var(--accent-gold);
+  border-left: 3px solid var(--color-blurple);
   padding-left: 12px;
   margin: 0.5em 0;
-  color: var(--text-secondary);
+  color: var(--color-text-secondary);
 }
+
+/* Tables: recessed well with subtle cell separators */
 .markdown :global(table) {
-  border-collapse: collapse;
-  margin: 0.5em 0;
-  font-size: 0.85em;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0.6em 0;
+  font-size: 0.86em;
+  width: 100%;
+  border-radius: var(--radius-buttons);
+  overflow: hidden;
+  box-shadow: var(--shadow-recessed);
 }
 .markdown :global(th),
 .markdown :global(td) {
-  border: 1px solid var(--bg-border);
-  padding: 0.35em 0.6em;
+  padding: 0.45em 0.7em;
+  text-align: left;
+  border-bottom: 1px solid rgba(184, 188, 194, 0.4);
 }
 .markdown :global(th) {
-  background: rgba(255, 255, 255, 0.04);
-  font-weight: 600;
-  text-align: left;
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.25);
 }
+.markdown :global(tr:last-child td) { border-bottom: none; }
 .markdown :global(hr) {
   border: none;
-  border-top: 1px solid var(--bg-border);
-  margin: 0.8em 0;
+  border-top: 2px solid var(--color-shadow-grey);
+  margin: 0.9em 0;
+  border-radius: var(--radius-pills);
 }
 .markdown :global(a) {
-  color: var(--accent-gold);
+  color: var(--color-blurple);
   text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-/* Streaming caret — blinks at the end of the last line of streaming markdown.
- *
- * Implementation: rendered as an `::after` pseudo-element on the last child of
- * the markdown container, so it sits inline at the end of the final paragraph
- * (or list item, code block, etc.). A separate sibling <span> next to <Markdown>
- * doesn't work — react-markdown's last block (usually <p>) is `display: block`
- * and pushes any sibling onto its own line. */
+/* Streaming caret — inline at end of last markdown block */
 .markdownStreaming > *:last-child::after {
   content: '';
   display: inline-block;
@@ -175,18 +178,16 @@
   height: 1.05em;
   margin-left: 3px;
   vertical-align: -0.18em;
-  background: var(--accent-gold);
-  box-shadow: 0 0 8px var(--accent-gold-glow);
+  background: var(--color-blurple);
   border-radius: 2px;
-  animation: streamingCaretBlink 0.6s ease-in-out infinite;
+  animation: streamingCaretBlink 0.7s ease-in-out infinite;
 }
 @keyframes streamingCaretBlink {
   0%, 100% { opacity: 1; }
-  50%      { opacity: 0.18; }
+  50%      { opacity: 0.15; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .markdownStreaming > *:last-child::after {
-    animation: none;
-  }
+  .row { animation: none; }
+  .markdownStreaming > *:last-child::after { animation: none; }
 }

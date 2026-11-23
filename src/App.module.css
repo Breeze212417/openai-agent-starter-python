@@ -1,3 +1,10 @@
+/* ═══════════════════════════════════════════════════════════
+   App shell — Neumorphism (StyleKit)
+   One light source: top-left highlight, bottom-right shadow.
+   Panels share the base colour and are separated by shadows,
+   never by borders or solid fills.
+   ═══════════════════════════════════════════════════════════ */
+
 .shell {
   position: relative;
   height: 100vh;
@@ -6,67 +13,46 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--bg-base);
+  background: var(--color-base);
+  padding: var(--spacing-24);
 }
 
-/* ambient blobs */
-.blob1 {
-  position: absolute;
-  top: -160px;
-  left: -160px;
-  width: 560px;
-  height: 560px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #f5c84218 0%, transparent 70%);
-  filter: blur(60px);
-  pointer-events: none;
-  animation: blobFloat 14s ease-in-out infinite alternate;
-}
+/* Ambient light blobs removed: neumorphism has a single fixed light
+   source and no coloured glow. Elements kept in the DOM for structure. */
+.blob1,
 .blob2 {
-  position: absolute;
-  bottom: -120px;
-  right: -120px;
-  width: 460px;
-  height: 460px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #5a4af215 0%, transparent 70%);
-  filter: blur(80px);
-  pointer-events: none;
-  animation: blobFloat 18s ease-in-out infinite alternate-reverse;
+  display: none;
 }
 
-@keyframes blobFloat {
-  0%   { transform: translate(0,0) scale(1); }
-  100% { transform: translate(40px, 30px) scale(1.08); }
-}
-
-/* ── Three-panel stage ─────────────────────────────────────── */
+/* ── Three-panel stage ─────────────────────────────────────
+   Panels are raised cards with a gap >= the shadow blur radius,
+   so the two shadow pairs never overlap and turn muddy.        */
 .stage {
   position: relative;
   z-index: 1;
   display: flex;
-  width: min(1440px, 98vw);
+  gap: var(--spacing-16);
+  width: min(1280px, 96vw);
   height: min(88vh, 840px);
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  border: 1px solid var(--bg-border);
-  box-shadow: var(--shadow-card), 0 0 0 1px rgba(255,255,255,.03) inset;
-  animation: stageIn 500ms cubic-bezier(.22,1,.36,1) both;
+  animation: stageIn 400ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
 @keyframes stageIn {
-  from { opacity: 0; transform: translateY(14px) scale(.985); }
-  to   { opacity: 1; transform: translateY(0)    scale(1); }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Middle: chat panel ────────────────────────────────────── */
+/* ── Middle: chat panel (raised card) ────────────────────── */
 .chatPanel {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  background: var(--bg-surface);
+  background: var(--color-base);
+  border-radius: var(--radius-cards);
+  box-shadow: var(--shadow-raised);
   min-width: 0;
   position: relative;
+  overflow: hidden;
 }
 
 .chatWindowShell {
@@ -85,21 +71,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-surface);
+  background: var(--color-base);
 }
 .historySpinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--bg-border);
-  border-top-color: var(--accent-gold);
-  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--color-shadow-grey);
+  border-top-color: var(--color-blurple);
+  border-radius: var(--radius-pills);
   animation: historySpin .8s linear infinite;
 }
 @keyframes historySpin {
   to { transform: rotate(360deg); }
 }
 
-/* ── Right: code panel ────────────────────────────────────── */
+/* ── Right: code panel (raised card) ────────────────────── */
 .codePanel {
   flex: 0 0 38%;
   display: flex;
@@ -107,55 +93,68 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  border-radius: var(--radius-cards);
+  background: var(--color-base);
+  box-shadow: var(--shadow-raised);
 }
 
 @media (max-width: 1100px) {
-  .codePanel {
-    flex: 0 0 36%;
-  }
+  .codePanel { flex: 0 0 36%; }
 }
 
 @media (max-width: 900px) {
-  .codePanel {
-    display: none;
-  }
+  .codePanel { display: none; }
 }
 
-/* ── Header (inside chat panel) ───────────────────────────── */
+/* ── Header (inside chat panel) ─────────────────────────────
+   No border: a recessed underline strip separates it instead.  */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 18px 28px;
-  border-bottom: 1px solid var(--bg-border);
-  background: rgba(255,255,255,.015);
+  gap: var(--spacing-16);
+  padding: var(--spacing-16) var(--spacing-24);
   flex-shrink: 0;
   flex-wrap: wrap;
+  box-shadow: inset 0 -6px 12px -8px var(--color-shadow-grey);
 }
 .headerLeft {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacing-16);
+  min-width: 0;
 }
 .logo {
-  font-size: 1.8rem;
-  color: var(--accent-gold);
-  line-height: 1;
-  filter: drop-shadow(0 0 8px var(--accent-gold-glow));
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--color-blurple);
+  line-height: 1;
+  border-radius: var(--radius-buttons);
+  background: var(--color-base);
+  box-shadow: var(--shadow-raised);
 }
 .title {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: .06em;
-  color: var(--text-primary);
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
+  letter-spacing: 0;
+  text-transform: none;
 }
 .subtitle {
-  font-size: .65rem;
-  color: var(--text-muted);
-  letter-spacing: .04em;
-  margin-top: 2px;
+  font-size: var(--text-label);
+  color: var(--color-text-muted);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage { animation: none; }
+  .historySpinner { animation: none; }
 }
