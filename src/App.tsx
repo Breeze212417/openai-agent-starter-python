@@ -446,9 +446,18 @@ function AppInner() {
         void refreshConversations('replace');
       },
 
-      onError() {
+      onError(err: Error) {
         clearBotStreaming();
-        updateBotMessage(content => content || t("status.error"));
+        // Preserve any partial answer, but append the real cause so the user
+        // (and the debug panel) can tell a timeout from an auth/model failure.
+        const reason = err?.message ? `⚠️ ${err.message}` : t("status.error");
+        updateBotMessage(content => (content ? `${content}\n\n${reason}` : reason));
+        setDebugEvents(prev => [...prev, {
+          eventType: 'error',
+          data: { message: err?.message || t("status.error") },
+          raw: err?.message || '',
+          timestamp: Date.now(),
+        }]);
         finishStream();
       },
     }, conversationIdRef.current, {

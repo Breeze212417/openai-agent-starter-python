@@ -149,9 +149,11 @@ export function sendMessageStream(
         }
       }
 
-      // Fallback: trigger done only if backend did not send done event
+      // A completed stream without a `done` frame means the platform cut the
+      // connection (e.g. function execution timeout) — surface it instead of
+      // silently treating a truncated reply as a successful finish.
       if (!doneReceived) {
-        callbacks.onDone();
+        callbacks.onError(new Error('响应流中断：后端未发送完成信号，可能是函数执行超时或连接被平台断开'));
       }
     } catch (err) {
       // AbortError does not trigger error callback
