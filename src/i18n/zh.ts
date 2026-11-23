@@ -1,7 +1,7 @@
 const zh = {
   // Header
   "app.title": "OpenAI Agents Starter",
-  "app.subtitle": "运行在 EdgeOne Makers 上，支持会话记忆、Agent Tools",
+  "app.subtitle": "运行于 EdgeOne Makers",
 
   // Empty state
   "empty.title": "OpenAI Agents Starter",
@@ -17,13 +17,13 @@ const zh = {
   "preset.2": "帮我翻译英文\"你好，欢迎来到北京！\"，并统计翻译字符数。",
 
   // Tool indicators
-  "tool.weather": "天气查询",
-  "tool.clothing": "穿衣建议",
-  "tool.walk": "步行路线",
-  "tool.cycling": "骑行路线",
-  "tool.driving": "驾车路线",
-  "tool.translate": "文本翻译",
-  "tool.statistics": "文本统计",
+  "tool.weather": "天气",
+  "tool.clothing": "穿衣",
+  "tool.walk": "步行",
+  "tool.cycling": "骑行",
+  "tool.driving": "驾车",
+  "tool.translate": "翻译",
+  "tool.statistics": "统计",
 
   // Status & errors
   "status.error": "⚠️ 请求失败，请检查后端服务是否启动。",

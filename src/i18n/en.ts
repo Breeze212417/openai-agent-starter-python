@@ -1,7 +1,7 @@
 const en = {
   // Header
   "app.title": "OpenAI Agents Starter",
-  "app.subtitle": "Running on EdgeOne Makers with session memory & Agent Tools",
+  "app.subtitle": "Runs on EdgeOne Makers",
 
   // Empty state
   "empty.title": "OpenAI Agents Starter",
@@ -18,12 +18,12 @@ const en = {
 
   // Tool indicators
   "tool.weather": "Weather",
-  "tool.clothing": "Clothing",
-  "tool.walk": "Walking",
-  "tool.cycling": "Cycling",
-  "tool.driving": "Driving",
-  "tool.translate": "Translate",
-  "tool.statistics": "Statistics",
+  "tool.clothing": "Outfit",
+  "tool.walk": "Walk",
+  "tool.cycling": "Bike",
+  "tool.driving": "Car",
+  "tool.translate": "Trans",
+  "tool.statistics": "Stats",
 
   // Status & errors
   "status.error": "Request failed. Please check if the backend service is running.",

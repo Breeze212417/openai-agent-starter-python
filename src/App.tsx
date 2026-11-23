@@ -630,11 +630,10 @@ function AppInner() {
                 aria-pressed={rightPanelOpen}
                 title={rightPanelOpen ? t('panel.hide') : t('panel.show')}
               >
-                <svg viewBox='0 0 24 24' width={18} height={18} fill='none' stroke='currentColor' strokeWidth={1.8} strokeLinecap='round' strokeLinejoin='round' aria-hidden='true'>
+                <svg viewBox='0 0 24 24' width={16} height={16} fill='none' stroke='currentColor' strokeWidth={1.8} strokeLinecap='round' strokeLinejoin='round' aria-hidden='true'>
                   <rect x='3' y='4' width='18' height='16' rx='3' />
                   <path d='M15 4v16' />
                 </svg>
-                <span className={styles.panelToggleLabel}>{rightPanelOpen ? t('panel.hide') : t('panel.show')}</span>
               </button>
             </div>
           </header>
