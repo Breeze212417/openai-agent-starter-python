@@ -85,9 +85,13 @@
   to { transform: rotate(360deg); }
 }
 
-/* ── Right: code panel (raised card) ────────────────────── */
+/* ── Right: code / trace panel — collapsible ──────────────
+   Collapsed by default; expands into a docked drawer with a
+   smooth width + slide transition. Negative margin cancels the
+   stage gap so the chat panel reclaims the full width.        */
 .codePanel {
-  flex: 0 0 38%;
+  flex: 0 0 0%;
+  margin-left: calc(-1 * var(--spacing-16));
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -95,15 +99,61 @@
   overflow: hidden;
   border-radius: var(--radius-cards);
   background: var(--color-base);
+  box-shadow: none;
+  opacity: 0;
+  transform: translateX(24px);
+  pointer-events: none;
+  visibility: hidden;
+  transition: flex-basis 360ms cubic-bezier(.22, 1, .36, 1),
+              margin-left 360ms cubic-bezier(.22, 1, .36, 1),
+              opacity 240ms ease,
+              transform 360ms cubic-bezier(.22, 1, .36, 1),
+              box-shadow 360ms ease,
+              visibility 0s linear 360ms;
+}
+
+.codePanelOpen {
+  flex-basis: 38%;
+  margin-left: 0;
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  visibility: visible;
   box-shadow: var(--shadow-raised);
+  transition-delay: 0s;
 }
 
 @media (max-width: 1100px) {
-  .codePanel { flex: 0 0 36%; }
+  .codePanelOpen { flex-basis: 36%; }
 }
 
+/* Narrow screens: the inspector becomes an overlay drawer so the
+   chat panel stays usable. Falls back to a full-height sheet.    */
 @media (max-width: 900px) {
-  .codePanel { display: none; }
+  .codePanel,
+  .codePanelOpen {
+    flex-basis: 0;
+    margin-left: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    width: min(420px, 82vw);
+    box-shadow: var(--shadow-raised);
+  }
+  .codePanel {
+    transform: translateX(105%);
+    opacity: 0;
+  }
+  .codePanelOpen {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codePanel { transition: none; }
 }
 
 /* ── Header (inside chat panel) ─────────────────────────────
@@ -118,6 +168,52 @@
   flex-wrap: wrap;
   box-shadow: inset 0 -6px 12px -8px var(--color-shadow-grey);
 }
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-16);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* Panel toggle: neumorphic raised pill with hover lift + press */
+.panelToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--radius-pills);
+  background: var(--color-base);
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  box-shadow: 4px 4px 8px var(--color-shadow-grey), -4px -4px 8px var(--color-highlight);
+  transition: box-shadow var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.panelToggle:hover {
+  color: var(--color-blurple);
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 12px var(--color-shadow-grey), -6px -6px 12px var(--color-highlight);
+}
+.panelToggle:active { transform: translateY(0); box-shadow: var(--shadow-pressed); }
+.panelToggle:focus-visible { outline: 2px solid var(--color-blurple); outline-offset: 2px; }
+.panelToggleActive {
+  color: var(--color-blurple);
+  box-shadow: var(--shadow-pressed);
+}
+.panelToggleActive:hover { transform: none; box-shadow: var(--shadow-pressed); }
+.panelToggleLabel { line-height: 1; }
+
+@media (max-width: 640px) {
+  .panelToggleLabel { display: none; }
+  .panelToggle { padding: 8px; }
+}
+
 .headerLeft {
   display: flex;
   align-items: center;

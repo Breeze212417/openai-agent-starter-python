@@ -54,6 +54,10 @@ const zh = {
   // Language toggle
   "lang.switch": "English",
 
+  // Right-side inspector toggle
+  "panel.show": "显示面板",
+  "panel.hide": "隐藏面板",
+
   // ─── Floating bottom-right action badges ─────────────────────────────
   "floatingLink.deploy": "一键部署",
   "floatingLink.github": "GitHub",

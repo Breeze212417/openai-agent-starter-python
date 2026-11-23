@@ -39,6 +39,15 @@ const LAMP_I18N_KEYS: Record<string, string> = {
 };
 
 const CONVERSATION_ID_STORAGE_KEY = 'eo_conversation_id';
+const RIGHT_PANEL_STORAGE_KEY = 'eo_right_panel_open';
+
+function getInitialRightPanelOpen(): boolean {
+  try {
+    return localStorage.getItem(RIGHT_PANEL_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
 
 /**
  * eo-uuid: stable per-browser identifier. Generated client-side on first
@@ -104,6 +113,14 @@ function AppInner() {
   const [historyLoading, setHistoryLoading] = useState(true);
   const [debugEvents, setDebugEvents] = useState<RawSseEvent[]>([]);
   const [rightPanelMode, setRightPanelMode] = useState<'code' | 'debug'>('code');
+  // Right-side inspector is opt-in: collapsed by default, remembered across reloads.
+  const [rightPanelOpen, setRightPanelOpen] = useState<boolean>(getInitialRightPanelOpen);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(RIGHT_PANEL_STORAGE_KEY, String(rightPanelOpen));
+    } catch { /* storage may be unavailable */ }
+  }, [rightPanelOpen]);
 
   // Conversation list (sidebar) state
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
@@ -579,7 +596,23 @@ function AppInner() {
                 <p className={styles.subtitle}>{t("app.subtitle")}</p>
               </div>
             </div>
-            <ToolIndicators lamps={lamps} />
+            <div className={styles.headerActions}>
+              <ToolIndicators lamps={lamps} />
+              <button
+                type='button'
+                className={`${styles.panelToggle} ${rightPanelOpen ? styles.panelToggleActive : ''}`}
+                onClick={() => setRightPanelOpen(prev => !prev)}
+                aria-label={rightPanelOpen ? t('panel.hide') : t('panel.show')}
+                aria-pressed={rightPanelOpen}
+                title={rightPanelOpen ? t('panel.hide') : t('panel.show')}
+              >
+                <svg viewBox='0 0 24 24' width={18} height={18} fill='none' stroke='currentColor' strokeWidth={1.8} strokeLinecap='round' strokeLinejoin='round' aria-hidden='true'>
+                  <rect x='3' y='4' width='18' height='16' rx='3' />
+                  <path d='M15 4v16' />
+                </svg>
+                <span className={styles.panelToggleLabel}>{rightPanelOpen ? t('panel.hide') : t('panel.show')}</span>
+              </button>
+            </div>
           </header>
 
           <div className={styles.chatWindowShell}>
@@ -593,7 +626,7 @@ function AppInner() {
           <ChatInput onSend={handleSend} onStop={handleStop} onClear={handleClearHistory} disabled={loading} />
         </div>
 
-        <div className={styles.codePanel}>
+        <div className={`${styles.codePanel} ${rightPanelOpen ? styles.codePanelOpen : ''}`} aria-hidden={!rightPanelOpen}>
           {rightPanelMode === 'code' ? (
             <CodeViewer />
           ) : (

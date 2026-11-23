@@ -54,6 +54,10 @@ const en = {
   // Language toggle
   "lang.switch": "中文",
 
+  // Right-side inspector toggle
+  "panel.show": "Show panel",
+  "panel.hide": "Hide panel",
+
   // ─── Floating bottom-right action badges ─────────────────────────────
   "floatingLink.deploy": "Deploy",
   "floatingLink.github": "GitHub",

@@ -1,82 +1,38 @@
-import { useState } from 'react';
 import { useT } from '../i18n';
+import styles from './FloatingLinks.module.css';
 
 const REPO_URL = 'https://github.com/TencentEdgeOne/openai-agent-starter-python';
 
 /**
  * Floating GitHub badge anchored to the bottom-right viewport corner.
- * Stays grey at rest, darkens on hover. A localised tooltip floats above
- * the badge on hover/focus so users discover what the icon means.
- *
- * Inline styles only — no styling-system dependency. Tooltip rendering
- * uses opacity + pointer-events so it animates cleanly without flicker.
+ * Uses the shared neumorphic badge styling (dock entrance, hover lift,
+ * icon tilt, press state) from FloatingLinks.module.css. A localised
+ * tooltip floats above the badge on hover/focus.
  */
 export default function GitHubLink() {
-  const [hover, setHover] = useState(false);
   const { t } = useT();
   const label = t('floatingLink.github');
 
   return (
-    <a
-      href={REPO_URL}
-      target='_blank'
-      rel='noopener noreferrer'
-      aria-label={label}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
-      style={{
-        position: 'fixed',
-        right: 16,
-        bottom: 16,
-        zIndex: 50,
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 38,
-        height: 38,
-        borderRadius: '50%',
-        color: hover ? '#6d5dfc' : '#6b7280',
-        background: '#e0e5ec',
-        boxShadow: hover
-          ? '4px 4px 8px #b8bcc2, -4px -4px 8px #ffffff'
-          : '6px 6px 12px #b8bcc2, -6px -6px 12px #ffffff',
-        transition: 'color 200ms ease-out, box-shadow 200ms ease-out',
-        textDecoration: 'none',
-      }}
-    >
-      <span
-        role='tooltip'
-        style={{
-          position: 'absolute',
-          bottom: 'calc(100% + 6px)',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          padding: '4px 8px',
-          borderRadius: 8,
-          background: '#e0e5ec',
-          color: '#3d4451',
-          boxShadow: '4px 4px 8px #b8bcc2, -4px -4px 8px #ffffff',
-          fontSize: 12,
-          lineHeight: 1.4,
-          whiteSpace: 'nowrap',
-          pointerEvents: 'none',
-          opacity: hover ? 1 : 0,
-          transition: 'opacity 140ms ease',
-        }}
+    <div className={`${styles.dock} ${styles.dockGithub}`}>
+      <a
+        href={REPO_URL}
+        target='_blank'
+        rel='noopener noreferrer'
+        aria-label={label}
+        className={styles.fab}
       >
-        {label}
-      </span>
-      <svg
-        viewBox='0 0 24 24'
-        width={22}
-        height={22}
-        fill='currentColor'
-        aria-hidden='true'
-      >
-        <path d='M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.16 1.18a10.94 10.94 0 0 1 5.75 0c2.2-1.49 3.16-1.18 3.16-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.42-2.7 5.4-5.27 5.68.42.36.79 1.07.79 2.16 0 1.56-.01 2.81-.01 3.19 0 .31.21.67.8.56C20.21 21.39 23.5 17.07 23.5 12 23.5 5.73 18.27.5 12 .5z' />
-      </svg>
-    </a>
+        <span role='tooltip' className={styles.tooltip}>{label}</span>
+        <svg
+          viewBox='0 0 24 24'
+          width={22}
+          height={22}
+          fill='currentColor'
+          aria-hidden='true'
+        >
+          <path d='M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.87-1.54-3.87-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.16 1.18a10.94 10.94 0 0 1 5.75 0c2.2-1.49 3.16-1.18 3.16-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.42-2.7 5.4-5.27 5.68.42.36.79 1.07.79 2.16 0 1.56-.01 2.81-.01 3.19 0 .31.21.67.8.56C20.21 21.39 23.5 17.07 23.5 12 23.5 5.73 18.27.5 12 .5z' />
+        </svg>
+      </a>
+    </div>
   );
 }

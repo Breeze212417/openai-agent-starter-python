@@ -1,0 +1,99 @@
+/* ═══════════════════════════════════════════════════════════
+   Floating action badges — Neumorphism
+   Dock handles the entrance animation; the anchor inside owns
+   the interactive transforms so the two never fight over
+   the `transform` property.
+   ═══════════════════════════════════════════════════════════ */
+
+.dock {
+  position: fixed;
+  bottom: var(--spacing-16);
+  z-index: 50;
+  animation: dockIn 520ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.dockDeploy { right: 64px; animation-delay: 20ms; }
+.dockGithub { right: var(--spacing-16); animation-delay: 80ms; }
+
+@keyframes dockIn {
+  from { opacity: 0; transform: translateY(14px) scale(.86); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.fab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pills);
+  background: var(--color-base);
+  color: var(--color-text-secondary);
+  box-shadow: 6px 6px 12px var(--color-shadow-grey), -6px -6px 12px var(--color-highlight);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 280ms cubic-bezier(.22, 1, .36, 1),
+              box-shadow 280ms ease-out,
+              color 200ms ease-out;
+}
+
+.fab:hover,
+.fab:focus-visible {
+  transform: translateY(-5px) scale(1.08);
+  color: var(--color-blurple);
+  box-shadow: 9px 9px 18px var(--color-shadow-grey), -9px -9px 18px var(--color-highlight);
+  outline: none;
+}
+
+.fab:active {
+  transform: translateY(-1px) scale(.94);
+  box-shadow: var(--shadow-pressed);
+}
+
+/* Icon micro-motion — rocket tips forward, GitHub tilts */
+.fab svg { transition: transform 340ms cubic-bezier(.22, 1, .36, 1); }
+.dockDeploy .fab:hover svg,
+.dockDeploy .fab:focus-visible svg { transform: translateY(-2px) rotate(10deg); }
+.dockGithub .fab:hover svg,
+.dockGithub .fab:focus-visible svg { transform: rotate(-14deg) scale(1.05); }
+
+/* Tooltip slides up + fades in, no flicker */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  padding: 5px 10px;
+  border-radius: var(--radius-buttons);
+  background: var(--color-base);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised-hover);
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 6px) scale(.94);
+  transform-origin: bottom center;
+  transition: opacity 180ms ease,
+              transform 240ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.fab:hover .tooltip,
+.fab:focus-visible .tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock { animation: none; }
+  .fab, .fab svg, .tooltip { transition: none; }
+  .fab:hover, .fab:focus-visible { transform: none; }
+  .dockDeploy .fab:hover svg,
+  .dockDeploy .fab:focus-visible svg,
+  .dockGithub .fab:hover svg,
+  .dockGithub .fab:focus-visible svg { transform: none; }
+}
