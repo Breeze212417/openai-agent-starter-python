@@ -79,7 +79,16 @@ agent = Agent(
         "- 用户关心天气或需要结合天气给建议时 → get_weather（真实高德天气，返回实时天气与今明两日预报）。"
         "传城市名即可；查区县时若用户语境里有上级城市，务必传 parent_city 消歧（如查'朝阳区'传 parent_city='北京市'，"
         "否则可能匹配到长春的朝阳区）。\n"
-        "- 其余通用能力：翻译（translate_text，仍为演示实现）、文本统计（text_statistics）。"
+        "- 翻译需求 → translate_text（调用有道智云真实翻译，自动检测源语言）。"
+        "target_language 可传 en/ja/fr/ko/de/es/ru/zh-CN，也可传'英文'/'日语'/'法语'等中文名；"
+        "用户明确指定源语言时才传 source_language，否则留空自动检测。\n"
+        "- 翻译结果必须原样使用工具返回的 translation 字段。若工具返回 ok=false，"
+        "如实把 error 告诉用户（例如未配置密钥、额度不足），绝对不要自己编造译文，"
+        "也不要说'上面的译文是我按语义给出的'。\n"
+        "- 用户同时要求统计字符数 → 再调用 text_statistics，并明确说明统计的是原文还是译文。"
+        "统计数字必须原样引用工具返回的 charCount / charCountNoSpace / letterCount / wordCount / lineCount，"
+        "禁止自己心算或补充未经工具统计的数字（比如'字母部分 X 个'）。\n"
+        "- 其余通用能力：文本统计（text_statistics）。"
     ),
     tools=[
         resolve_location,

@@ -6,9 +6,12 @@ thing you need to change when swapping mock data for a real implementation
 (e.g. calling a weather API, a translation service, etc.).
 """
 
+import hashlib
 import json
 import os
 import re
+import time
+import uuid
 from typing import Annotated
 
 import requests
@@ -361,36 +364,235 @@ def get_clothing_advice(weather: Annotated[str, "天气描述（get_weather 返�
     return " ".join(parts)
 
 
-# ========== Tool: Translate Text ==========
+# ========== Tool: Translate Text (Youdao API) ==========
+# 接口统一为 https://openapi.youdao.com/api
+# 默认走旧版签名 md5(appid + q + salt + key)；若应用用新版 v3，设 YOUDAO_SIGN_VERSION=v3。
+# Requires YOUDAO_APPID + YOUDAO_KEY in .env / console env vars.
+_YOUDAO_URL = "https://openapi.youdao.com/api"
+
+# Normalize both language codes and human-readable names to Youdao codes.
+_YOUDAO_LANGS = {
+    "auto": "auto", "自动": "auto", "自动检测": "auto",
+    "zh": "zh-CN", "cn": "zh-CN", "zh-cn": "zh-CN", "zh_cn": "zh-CN",
+    "chinese": "zh-CN", "中文": "zh-CN", "简体中文": "zh-CN", "汉语": "zh-CN",
+    "en": "en", "english": "en", "英文": "en", "英语": "en",
+    "ja": "ja", "jp": "ja", "japanese": "ja", "日语": "ja", "日文": "ja",
+    "ko": "ko", "kr": "ko", "korean": "ko", "韩语": "ko", "韩文": "ko",
+    "fr": "fr", "french": "fr", "法语": "fr",
+    "de": "de", "german": "de", "德语": "de",
+    "es": "es", "spanish": "es", "西班牙语": "es",
+    "ru": "ru", "russian": "ru", "俄语": "ru",
+    "pt": "pt", "portuguese": "pt", "葡萄牙语": "pt",
+    "it": "it", "italian": "it", "意大利语": "it",
+    "ar": "ar", "arabic": "ar", "阿拉伯语": "ar",
+    "th": "th", "thai": "th", "泰语": "th",
+    "vi": "vi", "vietnamese": "vi", "越南语": "vi",
+    "id": "id", "indonesian": "id", "印尼语": "id",
+}
+
+_YOUDAO_ERROR_HINTS = {
+    "101": "缺少必填参数",
+    "102": "不支持的语言类型",
+    "103": "翻译文本过长（有道限制单次 5000 字节）",
+    "104": "不支持的 API 类型",
+    "105": "不支持的签名类型",
+    "108": "应用 ID 无效或产品配置异常",
+    "109": "非法 IP 访问，请检查有道应用的 IP 白名单",
+    "110": "账号已冻结",
+    "112": "请求参数非法",
+    "113": "权限校验失败，请检查应用是否开通文本翻译服务",
+    "114": "配额校验失败，有道翻译调用额度已用完",
+    "115": "appKey 不存在或非法",
+    "116": "服务禁用",
+    "201": "解码失败",
+    "202": "签名检验失败，请检查 appKey / appSecret 是否正确",
+    "203": "访问 IP 地址非法",
+    "401": "账户余额不足，请到有道智云充值",
+    "411": "访问频率受限，请稍后重试",
+    "501": "验证失败",
+}
+
+
+def _youdao_credentials() -> tuple[str, str]:
+    """Read Youdao credentials.
+
+    Classic (default): YOUDAO_APPID (应用ID) + YOUDAO_KEY (应用密钥).
+    Also accepts the v3-style names YOUDAO_APP_KEY / YOUDAO_APP_SECRET,
+    and the generic YOUDAO_API_KEY / YOUDAO_API_SECRET aliases.
+    """
+    app_id = (
+        os.getenv("YOUDAO_APPID", "").strip()
+        or os.getenv("YOUDAO_APP_KEY", "").strip()
+        or os.getenv("YOUDAO_API_KEY", "").strip()
+    )
+    api_key = (
+        os.getenv("YOUDAO_KEY", "").strip()
+        or os.getenv("YOUDAO_APP_SECRET", "").strip()
+        or os.getenv("YOUDAO_API_SECRET", "").strip()
+    )
+    return app_id, api_key
+
+
+def _youdao_sign_classic(app_id: str, api_key: str, text: str, salt: str) -> str:
+    """Classic Youdao sign: md5(appId + query + salt + apiKey).
+
+    Unlike v3, the query is used verbatim — no 10+len+10 shortening.
+    """
+    raw = f"{app_id}{text}{salt}{api_key}"
+    return hashlib.md5(raw.encode("utf-8")).hexdigest()
+
+
+def _youdao_sign_v3(app_id: str, api_key: str, text: str, salt: str, curtime: str) -> str:
+    """Youdao signType=v3: sha256(appKey + input + salt + curtime + appSecret).
+
+    input is the full text when len(text) <= 20, otherwise
+    first10 + str(len(text)) + last10 (characters, per Youdao spec).
+    """
+    if len(text) <= 20:
+        input_text = text
+    else:
+        input_text = text[:10] + str(len(text)) + text[-10:]
+    raw = f"{app_id}{input_text}{salt}{curtime}{api_key}"
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
 @function_tool
 def translate_text(
-    text: Annotated[str, "The text to translate"],
-    target_language: Annotated[str, "Target language code, e.g. en, ja, fr, ko, de"],
+    text: Annotated[str, "待翻译的文本。支持中英日韩法德西俄等语言，有道会自动检测源语言"],
+    target_language: Annotated[str, "目标语言，可用语言代码（en/ja/fr/ko/de/es/ru/zh-CN）或中文名（英文/日语/法语）"],
+    source_language: Annotated[str, "可选。源语言，留空或 auto 表示由有道自动检测"] = "",
 ) -> str:
-    """Translate text to the specified language."""
-    # TODO: Replace with real translation API (e.g. DeepL, Google Translate)
-    # Example:
-    #   import httpx
-    #   resp = httpx.post("https://api.deepl.com/v2/translate", data={...})
-    #   return resp.json()["translations"][0]["text"]
-    language_names = {
-        "en": "English",
-        "ja": "日本語",
-        "fr": "Français",
-        "ko": "한국어",
-        "de": "Deutsch",
-        "es": "Español",
-        "ru": "Русский",
+    """Translate text into the target language via the real Youdao Cloud API.
+
+    Returns JSON: {"ok", "engine", "source", "source_lang", "target_lang",
+    "translation", "alternatives"}. If credentials are missing or the API
+    rejects the request, returns {"ok": false, "error", ...} — no mock output.
+    """
+    text = (text or "").strip()
+    if not text:
+        return json.dumps({"ok": False, "error": "请提供需要翻译的文本"}, ensure_ascii=False)
+
+    to_code = _YOUDAO_LANGS.get((target_language or "").strip().lower(), "")
+    if not to_code:
+        return json.dumps(
+            {
+                "ok": False,
+                "error": f"暂不支持目标语言 '{target_language}'",
+                "supported": "en, ja, ko, fr, de, es, ru, zh-CN, pt, it, ar, th, vi, id",
+            },
+            ensure_ascii=False,
+        )
+    if to_code == "auto":
+        return json.dumps(
+            {"ok": False, "error": "目标语言不能是 auto，请指定具体语言，如 en / ja / fr"},
+            ensure_ascii=False,
+        )
+
+    from_code = _YOUDAO_LANGS.get((source_language or "").strip().lower(), "auto") or "auto"
+
+    app_id, api_key = _youdao_credentials()
+    if not app_id or not api_key:
+        return json.dumps(
+            {
+                "ok": False,
+                "error": (
+                    "有道翻译未配置：请在本地 .env 或 EdgeOne Makers 控制台环境变量中设置 "
+                    "YOUDAO_APPID（应用 ID）和 YOUDAO_KEY（应用密钥）"
+                ),
+            },
+            ensure_ascii=False,
+        )
+
+    # Youdao caps a single request at 5000 UTF-8 bytes; trim at a character boundary.
+    encoded = text.encode("utf-8")
+    if len(encoded) > 5000:
+        text = encoded[:5000].decode("utf-8", errors="ignore")
+        truncated = True
+    else:
+        truncated = False
+
+    salt = uuid.uuid4().hex
+    sign_version = os.getenv("YOUDAO_SIGN_VERSION", "classic").strip().lower()
+    request_data = {
+        "q": text,
+        "from": from_code,
+        "to": to_code,
+        "appKey": app_id,
+        "salt": salt,
     }
-    lang_name = language_names.get(target_language, target_language)
-    return f"[Mock translation to {lang_name}]: {text}"
+    if sign_version == "v3":
+        curtime = str(int(time.time()))
+        request_data.update(
+            {
+                "sign": _youdao_sign_v3(app_id, api_key, text, salt, curtime),
+                "signType": "v3",
+                "curtime": curtime,
+                "nonce": uuid.uuid4().hex,
+            }
+        )
+    else:
+        request_data["sign"] = _youdao_sign_classic(app_id, api_key, text, salt)
+
+    try:
+        resp = requests.post(_YOUDAO_URL, data=request_data, timeout=15)
+        resp.raise_for_status()
+        payload = resp.json()
+    except (requests.RequestException, ValueError) as e:
+        return json.dumps(
+            {"ok": False, "error": f"有道翻译请求失败: {type(e).__name__}"},
+            ensure_ascii=False,
+        )
+
+    error_code = str(payload.get("errorCode", ""))
+    if error_code != "0":
+        return json.dumps(
+            {
+                "ok": False,
+                "error_code": error_code,
+                "error": _YOUDAO_ERROR_HINTS.get(
+                    error_code, f"有道翻译返回错误码 {error_code}"
+                ),
+            },
+            ensure_ascii=False,
+        )
+
+    translations = payload.get("translation") or []
+    if not translations:
+        return json.dumps({"ok": False, "error": "有道未返回译文，请稍后重试"}, ensure_ascii=False)
+
+    result = {
+        "ok": True,
+        "engine": "youdao",
+        "sign_version": sign_version,
+        "source": text,
+        "source_lang": (payload.get("languages") or {}).get("from") or from_code,
+        "target_lang": to_code,
+        "translation": translations[0],
+    }
+    if len(translations) > 1:
+        result["alternatives"] = translations[1:5]
+    if truncated:
+        result["truncated"] = True
+        result["hint"] = "原文超过 5000 字节，仅翻译了前 5000 字节"
+    return json.dumps(result, ensure_ascii=False)
 
 
 # ========== Tool: Text Statistics ==========
 @function_tool
-def text_statistics(text: Annotated[str, "The text to analyze"]) -> str:
-    """Analyze text and return statistics like character count and word count."""
-    char_count = len(text)
-    word_count = len(text.split())
-    line_count = len(text.split("\n"))
-    return json.dumps({"charCount": char_count, "wordCount": word_count, "lineCount": line_count})
+def text_statistics(text: Annotated[str, "要统计的文本，原文或译文均可"]) -> str:
+    """Count characters, letters, words and lines in a text.
+
+    Returns JSON: charCount (with spaces/punctuation), charCountNoSpace,
+    letterCount (alphabetic only), wordCount (whitespace-separated), lineCount.
+    Report these numbers verbatim — do not recalculate or add extra numbers yourself.
+    """
+    return json.dumps(
+        {
+            "charCount": len(text),
+            "charCountNoSpace": sum(1 for c in text if not c.isspace()),
+            "letterCount": sum(1 for c in text if c.isalpha()),
+            "wordCount": len(text.split()),
+            "lineCount": len(text.split("\n")),
+        },
+        ensure_ascii=False,
+    )
