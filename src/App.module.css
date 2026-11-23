@@ -173,18 +173,21 @@
    Dashed underline strip separates it from the message list. */
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--spacing-16);
   padding: var(--spacing-16) var(--spacing-24);
   flex-shrink: 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   border-bottom: 2px dashed var(--color-ink);
 }
 .headerActions {
   display: flex;
   align-items: center;
-  gap: var(--spacing-16);
+  justify-content: flex-end;
+  align-content: flex-start;
+  gap: 6px;
+  flex: 1 1 auto;
   flex-wrap: wrap;
   min-width: 0;
 }
@@ -193,8 +196,8 @@
 .panelToggle {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
+  gap: 5px;
+  padding: 5px 8px;
   border: var(--border-doodle);
   border-radius: var(--radius-buttons);
   background: var(--color-cream);

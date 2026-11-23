@@ -7,14 +7,14 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 6px 9px;
+  gap: 4px;
+  padding: 5px 7px;
   border: var(--border-doodle);
   border-radius: var(--radius-buttons);
   background: var(--color-cream);
   box-shadow: 3px 3px 0 rgba(44, 44, 44, 0.14);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: var(--fw-semibold);
   color: var(--color-ink);
   transition: background var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
