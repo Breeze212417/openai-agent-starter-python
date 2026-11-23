@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, KeyboardEvent } from 'react';
-import { useT, MessageKeys } from '../i18n';
+import { useT } from '../i18n';
 import styles from './ChatInput.module.css';
 
 interface Props {
@@ -8,8 +8,6 @@ interface Props {
   onClear: () => void;
   disabled: boolean;
 }
-
-const PRESET_KEYS = ['preset.1', 'preset.2'] as const;
 
 export default function ChatInput({ onSend, onStop, onClear, disabled }: Props) {
   const [value, setValue] = useState('');
@@ -40,26 +38,8 @@ export default function ChatInput({ onSend, onStop, onClear, disabled }: Props) 
     el.style.height = `${Math.min(el.scrollHeight, 140)}px`;
   };
 
-  const handlePreset = (text: string) => {
-    if (disabled) return;
-    onSend(text);
-  };
-
   return (
     <div className={styles.bar}>
-      <div className={styles.presets}>
-        {PRESET_KEYS.map(key => (
-          <button
-            key={key}
-            className={styles.presetChip}
-            onClick={() => handlePreset(t(key as MessageKeys))}
-            disabled={disabled}
-          >
-            {t(key as MessageKeys)}
-          </button>
-        ))}
-      </div>
-
       <div className={`${styles.inputWrap} ${disabled ? styles.inputDisabled : ''}`}>
         <textarea
           ref={textareaRef}

@@ -5,10 +5,10 @@
 .window {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-32) var(--spacing-24) var(--spacing-16);
+  padding: var(--spacing-16) var(--spacing-24) var(--spacing-8);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-24);
+  gap: var(--spacing-16);
 }
 
 /* Empty state */

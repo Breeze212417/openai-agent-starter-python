@@ -40,7 +40,7 @@
 
 .bubble {
   position: relative;
-  max-width: 72%;
+  max-width: 88%;
   padding: 14px 18px 26px;
   border: var(--border-doodle);
   border-radius: var(--radius-cards);
