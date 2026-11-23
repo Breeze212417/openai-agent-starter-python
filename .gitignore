@@ -42,6 +42,7 @@ AGENTS.md
 
 # Workspace tooling
 .workbuddy/
+output/
 
 # Tencent Cloud EdgeOne
 .edgeone/*

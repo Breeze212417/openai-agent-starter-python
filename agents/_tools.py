@@ -246,35 +246,119 @@ def walking_route(
     )
 
 
-# ========== Tool: Get Weather ==========
+# ========== Tool: Get Weather (AMap real weather) ==========
+_AMAP_WEATHER_URL = "https://restapi.amap.com/v3/weather/weatherInfo"
+
+
 @function_tool
-def get_weather(city: Annotated[str, "The city to get weather for"]) -> str:
-    """Get the current weather for a specified city."""
-    # TODO: Replace with real weather API (e.g. OpenWeatherMap, wttr.in)
-    # Example:
-    #   import httpx
-    #   resp = httpx.get(f"https://api.openweathermap.org/...?q={city}&appid=YOUR_KEY")
-    #   return resp.text
-    mock_weather = {
-        "city": city,
-        "condition": "Sunny",
-        "temperature": {"min": 18, "max": 25, "unit": "°C"},
-        "wind": "Light breeze",
-    }
-    return json.dumps(mock_weather, ensure_ascii=False)
+def get_weather(
+    city: Annotated[str, "城市或区县名称，如 '北京'、'北京市'、'朝阳区'、'上海'"],
+    parent_city: Annotated[str, "可选。区县重名时用于消歧的上级城市，如 '朝阳区' 配 '北京市'（否则可能匹配到其他城市的同名区）"] = "",
+) -> str:
+    """Get real current weather plus today/tomorrow forecast for a Chinese city via AMap.
+
+    The city name is first geocoded to an adcode (pass parent_city to disambiguate
+    district names, e.g. 朝阳区 exists in both Beijing and Changchun), then queried
+    against AMap weather.
+    Returns JSON: {"ok", "city", "adcode", "live": {weather, temperature, wind_direction,
+    wind_power, humidity, report_time}, "forecast": [{date, day, night, day_temp, night_temp}]}
+    Temperatures are Celsius; wind_power uses the Beaufort-style scale AMap reports (e.g. '≤3').
+    """
+    city = city.strip()
+    if not city:
+        return json.dumps({"ok": False, "hint": "请提供城市或区县名称"}, ensure_ascii=False)
+
+    # 1) city name -> adcode (weather API only accepts adcode)
+    geo_params = {"address": city}
+    if parent_city.strip():
+        geo_params["city"] = parent_city.strip()
+    try:
+        geo = _amap_get(_AMAP_GEOCODE_URL, **geo_params)
+    except RuntimeError as e:
+        return json.dumps({"ok": False, "city": city, "hint": f"定位失败：{e}"}, ensure_ascii=False)
+    geocodes = geo.get("geocodes") or []
+    adcode = _first(geocodes[0].get("adcode")) if geocodes else ""
+    resolved_city = _first(geocodes[0].get("city")) if geocodes else ""
+    if not adcode:
+        return json.dumps(
+            {"ok": False, "city": city, "hint": "未找到该城市，请使用标准城市/区县名（如 '北京市'、'朝阳区'）"},
+            ensure_ascii=False,
+        )
+
+    result = {"ok": True, "city": resolved_city or city, "adcode": adcode}
+
+    # 2) live weather (extensions=base)
+    try:
+        live_data = _amap_get(_AMAP_WEATHER_URL, city=adcode, extensions="base")
+        lives = live_data.get("lives") or []
+        if lives:
+            live = lives[0]
+            result["live"] = {
+                "weather": live.get("weather", ""),
+                "temperature": live.get("temperature", ""),
+                "wind_direction": live.get("winddirection", ""),
+                "wind_power": live.get("windpower", ""),
+                "humidity": live.get("humidity", ""),
+                "report_time": live.get("reporttime", ""),
+            }
+    except RuntimeError as e:
+        result["live_error"] = str(e)
+
+    # 3) today/tomorrow forecast (extensions=all)
+    try:
+        fc_data = _amap_get(_AMAP_WEATHER_URL, city=adcode, extensions="all")
+        forecasts = fc_data.get("forecasts") or []
+        casts = forecasts[0].get("casts") if forecasts else []
+        result["forecast"] = [
+            {
+                "date": c.get("date", ""),
+                "day": c.get("dayweather", ""),
+                "night": c.get("nightweather", ""),
+                "day_temp": c.get("daytemp", ""),
+                "night_temp": c.get("nighttemp", ""),
+                "day_wind": f'{c.get("daywind", "")} {c.get("daypower", "")}级',
+            }
+            for c in (casts or [])[:2]
+        ]
+    except RuntimeError as e:
+        result["forecast_error"] = str(e)
+
+    if "live" not in result:
+        result["ok"] = False
+        result["hint"] = "高德未返回该城市的实时天气"
+    return json.dumps(result, ensure_ascii=False)
 
 
 # ========== Tool: Get Clothing Advice ==========
 @function_tool
-def get_clothing_advice(weather: Annotated[str, "The weather description (JSON or plain text)"]) -> str:
-    """Give clothing advice based on weather conditions."""
-    # TODO: Replace with more sophisticated logic or an external service
-    # Basic temperature-aware advice based on input
-    if re.search(r"(3[0-9]|4[0-9])\s*°", weather):
-        return "It's hot outside — wear a T-shirt and shorts, and remember sunscreen and water."
-    if re.search(r"(-\d|[0-9])(?=\s*°)", weather):
-        return "It's cold — wear a down jacket or heavy coat, plus a scarf and gloves."
-    return "A light long-sleeve jacket with casual pants and sneakers is a comfortable choice for going out."
+def get_clothing_advice(weather: Annotated[str, "天气描述（get_weather 返回的 JSON 或自然语言均可）"]) -> str:
+    """Give clothing advice based on weather conditions.
+
+    Accepts the JSON returned by get_weather (or free text). Temperature is parsed
+    from any number in the input (prefers the highest, i.e. daytime temp).
+    """
+    temps = [int(t) for t in re.findall(r"-?\d+", weather)]
+    temp = max(temps) if temps else None
+    rainy = any(w in weather for w in ("雨", "雷", " shower"))
+    snowy = "雪" in weather
+
+    parts = []
+    if temp is None:
+        parts.append("天气数据里没有可用温度，按春秋常温建议：长袖外套 + 长裤 + 运动鞋。")
+    elif temp >= 30:
+        parts.append("天气炎热：短袖短裤/薄裙，做好防晒并多补水。")
+    elif temp >= 20:
+        parts.append("天气温暖：T恤/长袖加薄外套即可，适合出行。")
+    elif temp >= 10:
+        parts.append("天气转凉：卫衣/夹克 + 长裤，怕冷可以加件薄羽绒。")
+    else:
+        parts.append("天气寒冷：厚羽绒服或大衣，围巾手套安排上。")
+
+    if rainy:
+        parts.append("有降水，记得带伞，鞋子选防水的。")
+    if snowy:
+        parts.append("有降雪，路面湿滑，穿防滑鞋并预留更多路上时间。")
+    return " ".join(parts)
 
 
 # ========== Tool: Translate Text ==========
