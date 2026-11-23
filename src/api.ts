@@ -149,6 +149,15 @@ export function sendMessageStream(
         }
       }
 
+      // Some edge proxies trim the trailing blank line of the response body.
+      // Without it, the final `done` frame stays in `buffer` and is never
+      // dispatched, which looks like a truncated stream even though the
+      // server returned 200 with a complete body. Flush the remainder.
+      buffer += decoder.decode();
+      if (buffer.trim()) {
+        dispatchSseChunk(buffer, callbacks, () => { doneReceived = true; });
+      }
+
       // A completed stream without a `done` frame means the platform cut the
       // connection (e.g. function execution timeout) — surface it instead of
       // silently treating a truncated reply as a successful finish.
